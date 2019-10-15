@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rimraf bundle && rimraf dist && webpack --config webpack.config.js --mode=production",
     "start": "webpack-dev-server --mode=development",
+    "update-metadata": "yarn odata-fetchr",
     "clean": "rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,6 +29,7 @@
   },
   "dependencies": {
     "@furystack/shades": "^1.0.0",
+    "@furystack/odata-fetchr": "^0.1.5",
     "lodash": "^4.17.10"
   }
 }

@@ -12,10 +12,7 @@
       "frontend",
       "service"
     ],
-    "nohoist": [
-      "!eslint*",
-      "**/*"
-    ]
+    "nohoist": []
   },
   "dependencies": {
     "tslib": "^1.10.0"

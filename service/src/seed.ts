@@ -3,6 +3,8 @@ import { HttpAuthenticationSettings } from "@furystack/http-api";
 import { Injector } from "@furystack/inject";
 import { TypeOrmStore } from "@furystack/typeorm-store";
 import { User } from "./models";
+import { Servo } from "./models/servo";
+import { Motor } from "./models/motor";
 
 /**
  * gets an existing instance if exists or create and return if not. Throws error on multiple result
@@ -23,7 +25,7 @@ export const getOrCreate = async <T>(
   } else if (result.length === 0) {
     logger.verbose({
       message: `Entity of type '${
-        store.constructor.name
+        store.model.name
       }' not exists, adding: '${JSON.stringify(filter)}'`
     });
     return await store.add(instance);
@@ -57,6 +59,28 @@ export const seed = async (injector: Injector) => {
     userStore as PhysicalStore<User>,
     injector
   );
+
+  const servoStore = sm.getStoreFor(Servo);
+  const defaultServoValue = 90;
+
+  for (let i = 0; i < 4; i++) {
+    await getOrCreate(
+      { filter: { channel: i } },
+      { channel: i, currentValue: defaultServoValue },
+      servoStore,
+      injector
+    );
+  }
+
+  const motorStore = sm.getStoreFor(Motor);
+  for (let i = 0; i < 4; i++) {
+    await getOrCreate(
+      { filter: { id: i } },
+      { id: i, value: 0 },
+      motorStore,
+      injector
+    );
+  }
 
   logger.verbose({ message: "Seeding data completed." });
 };
