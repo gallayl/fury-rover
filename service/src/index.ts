@@ -1,4 +1,5 @@
 import { join } from "path";
+import { InMemoryStore } from "@furystack/core";
 import { Injector } from "@furystack/inject";
 import { VerboseConsoleLogger } from "@furystack/logging";
 import {
@@ -15,6 +16,9 @@ import { seed } from "./seed";
 import { User, Session } from "./models";
 import { registerExitHandler } from "./exitHandler";
 import "./mqtt-injector-extensions";
+import { Servo } from "./models/servo";
+import { Motor } from "./models/motor";
+import { MotorService } from "./services/motor-service";
 
 export const authorizedOnly = async (options: { injector: Injector }) => {
   const authorized = await options.injector
@@ -43,7 +47,13 @@ export const i = new Injector()
     logging: false,
     synchronize: true
   })
-  .setupStores(stores => stores.useTypeOrmStore(User).useTypeOrmStore(Session))
+  .setupStores(stores =>
+    stores
+      .useTypeOrmStore(User)
+      .useTypeOrmStore(Session)
+      .addStore(new InMemoryStore({ model: Motor, primaryKey: "id" }))
+      .addStore(new InMemoryStore({ model: Servo, primaryKey: "channel" }))
+  )
   .useHttpApi({
     corsOptions: {
       credentials: true,
@@ -61,31 +71,89 @@ export const i = new Injector()
     port: parseInt(process.env.APP_SERVICE_PORT as string, 10) || 9090
   })
   .setupRepository(repo =>
-    repo.createDataSet(User, {
-      ...authorizedDataSet,
-      name: "users"
-    })
+    repo
+      .createDataSet(User, {
+        ...authorizedDataSet,
+        name: "users"
+      })
+      .createDataSet(Servo, {
+        name: "servos",
+        authorizeAdd: async () => ({
+          isAllowed: false,
+          message:
+            "Cannot add an entity into a prepopulated hardware collection"
+        })
+      })
+      .createDataSet(Motor, {
+        name: "motors",
+        authorizeAdd: async () => ({
+          isAllowed: false,
+          message:
+            "Cannot add an entity into a prepopulated hardware collection"
+        }),
+        onEntityUpdated: async ({ injector, id, change }) => {
+          change.value &&
+            injector
+              .getInstance(MotorService)
+              .setMotorValue(id as number, change.value);
+        }
+      })
   )
   .useOdata("odata", odata =>
     odata.addNameSpace("default", ns => {
       ns.setupEntities(entities =>
-        entities.addEntityType({
-          model: User,
-          primaryKey: "username",
-          properties: [{ property: "username", type: EdmType.String }],
-          name: "User"
-        })
+        entities
+          .addEntityType({
+            model: User,
+            primaryKey: "username",
+            properties: [{ property: "username", type: EdmType.String }],
+            name: "User"
+          })
+          .addEntityType({
+            model: Servo,
+            name: "Servo",
+            primaryKey: "channel",
+            properties: [
+              {
+                property: "currentValue",
+                type: EdmType.Int16
+              }
+            ]
+          })
+          .addEntityType({
+            model: Motor,
+            name: "Motor",
+            primaryKey: "id",
+            properties: [
+              {
+                property: "id",
+                type: EdmType.Int16
+              },
+              { property: "isReversed", type: EdmType.Boolean },
+              { property: "multiplier", type: EdmType.Int16 },
+              { property: "value", type: EdmType.Int16 }
+            ]
+          })
       ).setupCollections(collections =>
-        collections.addCollection({
-          model: User,
-          name: "users",
-          functions: [
-            {
-              action: GetCurrentUser,
-              name: "current"
-            }
-          ]
-        })
+        collections
+          .addCollection({
+            model: User,
+            name: "users",
+            functions: [
+              {
+                action: GetCurrentUser,
+                name: "current"
+              }
+            ]
+          })
+          .addCollection({
+            model: Motor,
+            name: "motors"
+          })
+          .addCollection({
+            model: Servo,
+            name: "servos"
+          })
       );
 
       ns.setupGlobalActions([
