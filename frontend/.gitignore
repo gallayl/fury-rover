@@ -61,7 +61,4 @@ typings/
 .next
 
 dist
-*.tsbuildinfo
-frontend/bundle
-
-service/data.sqlite
+bundle

@@ -1,0 +1,63 @@
+{
+  "name": "fury",
+  "version": "1.0.1",
+  "description": "example web app based on furystack",
+  "main": "service/src/index.ts",
+  "repository": "https://github.com/gallayl/fury.git",
+  "author": "Gallay Lajos <gallay.lajos@gmail.com>",
+  "license": "GPL-2.0-only",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "frontend",
+      "service"
+    ],
+    "nohoist": [
+      "!eslint*",
+      "**/*"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^1.10.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "^2.3.1",
+    "concurrently": "^4.1.1",
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-cypress": "^2.2.1",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-jsdoc": "^15.3.4",
+    "eslint-plugin-prettier": "^3.1.0",
+    "husky": "^3.0.0",
+    "lint-staged": "^9.4.0",
+    "prettier": "^1.18.2",
+    "rimraf": "^3.0.0",
+    "typescript": "^3.6.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --ext .tsx,.ts --cache --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{js,jsx}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "scripts": {
+    "build": "tsc -b && yarn workspace frontend build",
+    "start": "concurrently --kill-others \"yarn startService\" \"yarn startFrontend\"  ",
+    "startService": "yarn workspace service start",
+    "startFrontend": "yarn workspace frontend start --env.APP_SERVICE_URL=http://localhost:9090",
+    "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo",
+    "lint": "eslint . --ext .tsx,.ts --cache"
+  }
+}
