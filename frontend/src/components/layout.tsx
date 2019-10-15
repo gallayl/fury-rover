@@ -24,13 +24,7 @@ export const Layout = Shade({
       >
         <Header
           title="🦇 Shades Demo"
-          links={
-            [
-              // { name: "✅ TodoApp", url: "/todo-app" },
-              // { name: "⏳ Lazy Load Demo", url: "/lazy-load" },
-              // { name: "🧮 Counter Demo", url: "/counter-demo" }
-            ]
-          }
+          links={[{ name: "👀 FPV", url: "/fpv" }]}
         />
         <Body />
       </div>

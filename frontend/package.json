@@ -30,6 +30,6 @@
   "dependencies": {
     "@furystack/shades": "^1.0.0",
     "@furystack/odata-fetchr": "^0.1.5",
-    "lodash": "^4.17.10"
+    "nipplejs": "^0.8.3"
   }
 }
