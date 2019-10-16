@@ -24,7 +24,10 @@ export const Layout = Shade({
       >
         <Header
           title="🦇 Shades Demo"
-          links={[{ name: "👀 FPV", url: "/fpv" }]}
+          links={[
+            { name: "👀 FPV", url: "/fpv" },
+            { name: "😷 Stats", url: "/stats" }
+          ]}
         />
         <Body />
       </div>

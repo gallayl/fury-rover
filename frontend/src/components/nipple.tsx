@@ -1,15 +1,14 @@
-import { Shade, createComponent } from "@furystack/shades";
+import { Shade, createComponent, PartialElement } from "@furystack/shades";
 import {
   create,
   JoystickManagerOptions,
   EventData,
   JoystickOutputData
 } from "nipplejs";
-import { DeepPartial } from "@sensenet/client-utils";
 
 export interface NippleComponentProps {
   managerOptions: JoystickManagerOptions;
-  style?: DeepPartial<CSSStyleDeclaration>;
+  style?: PartialElement<CSSStyleDeclaration>;
   onStart?: (evt: EventData, data: JoystickOutputData) => void;
   onEnd?: (evt: EventData, data: JoystickOutputData) => void;
   onDir?: (evt: EventData, data: JoystickOutputData) => void;

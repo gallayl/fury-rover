@@ -12,7 +12,9 @@ export const FirstPersonView = Shade({
         }}
       >
         <h3>First Person View</h3>
-        <NippleComponent managerOptions={{}} />
+        <NippleComponent managerOptions={{}}>
+          <img src="" alt="" />
+        </NippleComponent>
       </div>
     );
   }
