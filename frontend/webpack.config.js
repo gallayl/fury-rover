@@ -45,6 +45,13 @@ module.exports = {
     new TsConfigWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: "./index.html"
+    }),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: "development",
+      DEBUG: true,
+      APP_VERSION: require("./package.json").version,
+      BUILD_DATE: new Date().toISOString(),
+      SERVICE_URL: "http://localhost:9090"
     })
   ],
   module: {

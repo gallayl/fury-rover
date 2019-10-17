@@ -32,7 +32,7 @@ export const NippleComponent = Shade<NippleComponentProps>({
     props.onMove && manager.on("move", props.onMove);
     return () => manager.destroy();
   },
-  render: ({ props }) => {
+  render: ({ props, children }) => {
     return (
       <div
         style={{
@@ -41,7 +41,9 @@ export const NippleComponent = Shade<NippleComponentProps>({
           position: "relative",
           ...props.style
         }}
-      ></div>
+      >
+        {children}
+      </div>
     );
   }
 });

@@ -9,5 +9,5 @@ export const odataContext = {
   /**
    * Metadata creation date
    */
-  creationDate: "2019-10-15T13:58:59.451Z"
+  creationDate: "2019-10-17T09:06:54.904Z"
 };
