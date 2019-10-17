@@ -58,6 +58,13 @@
     "@sensenet/client-utils" "^1.5.1"
     reflect-metadata "^0.1.13"
 
+"@furystack/logging@2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@furystack/logging/-/logging-2.0.2.tgz#99ea9fd8789bf5e7e3a25b222fa431e341e459fb"
+  integrity sha512-PbsBPicjgJH5TY8nn/gccER9WfEqtDhhJbTuZkdnlkgtCHJ+lsTQ58aApwByR50Yb791QeN+4FcdZc03Mvr6jg==
+  dependencies:
+    "@furystack/inject" "^4.0.2"
+
 "@furystack/logging@^2.0.3", "@furystack/logging@^2.0.5":
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/@furystack/logging/-/logging-2.0.5.tgz#268890bd9d3d79a0cde8ba56bd031ff4f55f2576"
@@ -65,10 +72,10 @@
   dependencies:
     "@furystack/inject" "^4.0.2"
 
-"@furystack/odata-fetchr@^0.1.5":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@furystack/odata-fetchr/-/odata-fetchr-0.1.6.tgz#382875953a3c3e5ca7a5df6a8122dfe956cfa65a"
-  integrity sha512-TNDZ3wjaREubsUMPWVVF4daK7PxifcjGTU68Pnkhnr8NG9Kp2uiNTYk6t9aHstbJrFdi3vyhgDFWMm1alJPtQw==
+"@furystack/odata-fetchr@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@furystack/odata-fetchr/-/odata-fetchr-0.2.0.tgz#d270446ee0eaf5737b55fe4f049e8ec28a27ea7a"
+  integrity sha512-avQmHUEoE4A15skCWxRAcZJ1aVAAVTN2rx0e3HTwTT7MLAdQtMDFRtd4+lD8TK9wgD+N7/We/tYOJpc8m2pCOg==
   dependencies:
     "@furystack/inject" "^4.0.2"
     "@furystack/logging" "^2.0.5"
@@ -76,33 +83,34 @@
     jsdom "^15.1.1"
 
 "@furystack/odata@^2.0.5":
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/@furystack/odata/-/odata-2.0.7.tgz#60202a3d1cb502d900fbcc7aa8d1098fc97c7263"
-  integrity sha512-DS6evU2Ntw2565SIiNzTxwBhDJOZi//Y8fbrWnVIh1gLlaZ6NR+JztfydhlKW64slelvRX2S8bIoBPQHpPj6uw==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@furystack/odata/-/odata-2.1.0.tgz#5ae926495bcd4a045e011141a0917c7526db18ec"
+  integrity sha512-XGUgRfVpRNkilsYabNVFjvgFyObfcvSy27/BXQuCq62Mi/safjpmI03b7HmFDUtwWeJtSGnO258TK8PU6+lA7w==
   dependencies:
     "@furystack/core" "^6.0.3"
     "@furystack/http-api" "^5.2.3"
     "@furystack/inject" "^4.0.2"
-    "@furystack/repository" "^2.0.5"
+    "@furystack/repository" "^2.0.6"
     "@sensenet/client-utils" "^1.5.1"
 
-"@furystack/repository@^2.0.3", "@furystack/repository@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@furystack/repository/-/repository-2.0.5.tgz#bdf4696bf39bd8505a76ce54a457e7a4251e8e77"
-  integrity sha512-FCbkYI3YEJmZhprzGQ3OGqGohiA1gr8hgTLte9LkXmO98Bv5QS4db766fQ0PukJW86pZRoeBWiJYGp6LmhJdQA==
+"@furystack/repository@^2.0.3", "@furystack/repository@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@furystack/repository/-/repository-2.0.6.tgz#6d80ba43b606f561646df00d3277ed83d4b261df"
+  integrity sha512-3VmtWtETCKozGr2kETJNitvphZ5ZDe7SCFU8uf17WTelu7DLE0+0OvpEkq5HTMUaTe2nk+KYb0hFNnaJpx3QLw==
   dependencies:
     "@furystack/core" "^6.0.3"
     "@furystack/inject" "^4.0.2"
     "@sensenet/client-utils" "^1.5.1"
 
 "@furystack/shades@^1.0.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@furystack/shades/-/shades-1.1.0.tgz#92f6d75daf2e86bd983f7e05aadb82b4e01a9afe"
-  integrity sha512-NpnSUVnE6NxNMeeWNXXAuRyFx9ijiuRa/VOQ8J5NkuSmVWBBe65NRPJJHycMY/0MIJZw+GR/lsfSbGKzzRN/WA==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@furystack/shades/-/shades-1.2.0.tgz#7f4809409355a745a36928ff5ceb0fc44a430b74"
+  integrity sha512-82Qp5oulyLBIdkSW0j+efrIp73d+pk/pdRspJJB0KNLnmlMTwH82vQjOyn+HZpGj/+p3RtSlAr3oRsZ4KbGwIg==
   dependencies:
     "@furystack/core" "^6.0.3"
     "@furystack/http-api" "^5.2.3"
     "@furystack/inject" "^4.0.2"
+    "@furystack/logging" "2.0.2"
     "@sensenet/client-utils" "^1.5.1"
 
 "@furystack/typeorm-store@^3.0.1":
@@ -1402,13 +1410,13 @@ concat-stream@^1.5.0:
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
 
-concurrently@^4.1.1:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-4.1.2.tgz#1a683b2b5c41e9ed324c9002b9f6e4c6e1f3b6d7"
-  integrity sha512-Kim9SFrNr2jd8/0yNYqDTFALzUX1tvimmwFWxmp/D4mRI+kbqIIwE2RkBDrxS2ic25O1UgQMI5AtBqdtX3ynYg==
+concurrently@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-5.0.0.tgz#99c7567d009411fbdc98299d553c4b99a978612c"
+  integrity sha512-1yDvK8mduTIdxIxV9C60KoiOySUl/lfekpdbI+U5GXaPrgdffEavFa9QZB3vh68oWOpbCC+TuvxXV9YRPMvUrA==
   dependencies:
     chalk "^2.4.2"
-    date-fns "^1.30.1"
+    date-fns "^2.0.1"
     lodash "^4.17.15"
     read-pkg "^4.0.1"
     rxjs "^6.5.2"
@@ -1650,10 +1658,15 @@ data-urls@^1.1.0:
     whatwg-mimetype "^2.2.0"
     whatwg-url "^7.0.0"
 
-date-fns@^1.27.2, date-fns@^1.30.1:
+date-fns@^1.27.2:
   version "1.30.1"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
   integrity sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==
+
+date-fns@^2.0.1:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.5.0.tgz#b939f17c2902ce81cffe449702ba22c0781b38ec"
+  integrity sha512-I6Tkis01//nRcmvMQw/MRE1HAtcuA5Ie6jGPb8bJZJub7494LGOObqkV3ParnsSVviAjk5C8mNKDqYVBzCopWg==
 
 date-now@^0.1.4:
   version "0.1.4"
@@ -6884,9 +6897,9 @@ webidl-conversions@^4.0.2:
   integrity sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==
 
 webpack-bundle-analyzer@^3.3.2:
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/webpack-bundle-analyzer/-/webpack-bundle-analyzer-3.5.2.tgz#ac02834f4b31de8e27d71e6c7a612301ebddb79f"
-  integrity sha512-g9spCNe25QYUVqHRDkwG414GTok2m7pTTP0wr6l0J50Z3YLS04+BGodTqqoVBL7QfU/U/9p/oiI5XFOyfZ7S/A==
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/webpack-bundle-analyzer/-/webpack-bundle-analyzer-3.6.0.tgz#39b3a8f829ca044682bc6f9e011c95deb554aefd"
+  integrity sha512-orUfvVYEfBMDXgEKAKVvab5iQ2wXneIEorGNsyuOyVYpjYrI7CUOhhXNDd3huMwQ3vNNWWlGP+hzflMFYNzi2g==
   dependencies:
     acorn "^6.0.7"
     acorn-walk "^6.1.1"

@@ -6,7 +6,8 @@ import {
   LoginAction,
   LogoutAction,
   GetCurrentUser,
-  HttpUserContext
+  HttpUserContext,
+  JsonResult
 } from "@furystack/http-api";
 import "@furystack/typeorm-store";
 import { EdmType } from "@furystack/odata";
@@ -132,6 +133,46 @@ export const i = new Injector()
               { property: "isReversed", type: EdmType.Boolean },
               { property: "multiplier", type: EdmType.Int16 },
               { property: "value", type: EdmType.Int16 }
+            ],
+            functions: [
+              {
+                name: "getValue",
+                isBound: true,
+                action: async injector => {
+                  const entity = await injector
+                    .getOdataContext<Motor>()
+                    .getCurrentEntity();
+                  return JsonResult({ value: entity ? entity.value : 0 });
+                }
+              }
+            ],
+            actions: [
+              {
+                action: async injector => {
+                  const ctx = injector.getOdataContext<Motor>();
+                  const entity = await ctx.getCurrentEntity();
+                  if (entity) {
+                    await injector
+                      .getDataSetFor<Motor>("motors")
+                      .update(injector, entity.id, {
+                        ...entity,
+                        value: 0
+                      });
+
+                    return JsonResult({ result: "ok" });
+                  }
+                  return JsonResult(
+                    {
+                      error: "failed to update"
+                    },
+                    404
+                  );
+                },
+                name: "stop",
+                isBound: true,
+                parameters: [],
+                returnType: EdmType.Unknown
+              }
             ]
           })
       ).setupCollections(collections =>
@@ -148,7 +189,43 @@ export const i = new Injector()
           })
           .addCollection({
             model: Motor,
-            name: "motors"
+            name: "motors",
+            actions: [
+              {
+                name: "stopAll",
+                // parameters: [],
+                isBound: true,
+                returnType: EdmType.Unknown,
+                action: async injector => {
+                  const dataSet = injector
+                    .getOdataContext<Motor>()
+                    .getCurrentDataSet();
+                  const motors = await dataSet.filter(injector, {});
+                  motors.map(motor =>
+                    dataSet.update(injector, motor.id, { ...motor, value: 0 })
+                  );
+                  return JsonResult({ result: "ok" });
+                }
+              }
+            ],
+            functions: [
+              {
+                name: "getAllValue",
+                parameters: [],
+                isBound: true,
+                returnType: EdmType.Unknown,
+                action: async injector => {
+                  const dataSet = injector
+                    .getOdataContext<Motor>()
+                    .getCurrentDataSet();
+                  const motors = await dataSet.filter(injector, {});
+                  return JsonResult({
+                    result: "ok",
+                    values: motors.map(m => ({ id: m.id, value: m.value }))
+                  });
+                }
+              }
+            ]
           })
           .addCollection({
             model: Servo,

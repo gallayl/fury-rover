@@ -19,12 +19,27 @@ shadeInjector.useOdata({
   defaultInit: {}
 });
 
-const motors = shadeInjector.getInstance(Motors).getService();
+const motors = shadeInjector.getInstance(Motors);
 
 motors
+  .getService()
   .query()
   .exec()
-  .then(m => console.log("Motors:", m.value.map(motor => motor)));
+  .then(m => console.log("Motors Query:", m.value.map(motor => motor)));
+
+motors
+  .getValue(1)
+  .then(resp => console.log("Motors getValue response: ", resp));
+
+motors
+  .getAllValue()
+  .then(resp => console.log("Motors getValue response: ", resp));
+
+motors
+  .stop(1, undefined)
+  .then(resp => console.log("Motors Stop response: ", resp));
+
+motors.stopAll({}).then(resp => console.log("Motors stopall response", resp));
 
 shadeInjector.useLogging(VerboseConsoleLogger);
 

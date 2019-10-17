@@ -8,6 +8,11 @@ import { User } from "../entity-types/user";
  */
 @Injectable({ lifetime: "transient" })
 export class Users {
+  /**
+   * Custom collection action 'current'
+   */
+  public current = () =>
+    this.getService().execCustomCollectionFunction("current");
   public readonly entitySetUrl = "users";
   public getService = () => this.injector.getOdataServiceFor(User, "users");
   constructor(private injector: Injector) {}
