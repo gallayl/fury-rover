@@ -38,7 +38,16 @@ export class MotorService {
 
   public setMotorValue(motorId: number, motorValue: number) {
     this.pyService.stdin.writable &&
-      this.pyService.stdin.write(`motor ${motorId} ${motorValue}\n`);
+      this.pyService.stdin.write(`set ${motorId} ${motorValue}\n`);
+  }
+
+  public setAll(motorValue: number) {
+    this.pyService.stdin.writable &&
+      this.pyService.stdin.write(`setAll ${motorValue}\n`);
+  }
+
+  public stopAll() {
+    this.pyService.stdin.writable && this.pyService.stdin.write(`stopAll\n`);
   }
 
   private readonly logger: ScopedLogger;

@@ -197,6 +197,7 @@ export const i = new Injector()
                 isBound: true,
                 returnType: EdmType.Unknown,
                 action: async injector => {
+                  injector.getInstance(MotorService).stopAll();
                   const dataSet = injector
                     .getOdataContext<Motor>()
                     .getCurrentDataSet();
