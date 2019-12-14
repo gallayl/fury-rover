@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { join } from "path";
 import { Injectable, Injector } from "@furystack/inject";
 import { ScopedLogger } from "@furystack/logging";
-import { ObservableValue } from "@sensenet/client-utils";
+import { ObservableValue } from "@furystack/utils";
 
 /**
  * Service class for Adafruit Motor HAT

@@ -1,6 +1,6 @@
 import { Injectable, Injector } from "@furystack/inject";
 import { DataSet, Repository } from "@furystack/repository";
-import { Motor } from "../Models/Motor";
+import { Motor } from "../models/motor";
 
 /**
  * Options model for movement controls

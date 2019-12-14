@@ -1,5 +1,5 @@
 /** ToDo: Main entry point */
-import { PathHelper } from "@sensenet/client-utils";
+import { PathHelper } from "@furystack/utils";
 import { createComponent, shadeInjector } from "@furystack/shades";
 import { VerboseConsoleLogger } from "@furystack/logging";
 import { Layout } from "./components/layout";
@@ -11,7 +11,9 @@ export const environmentOptions = {
   debug: Boolean(process.env.DEBUG),
   appVersion: process.env.APP_VERSION as string,
   buildDate: new Date(process.env.BUILD_DATE as string),
-  serviceUrl: process.env.SERVICE_URL as string
+  serviceUrl:
+    (process.env.SERVICE_URL as string) ||
+    `${window.location.protocol}//${window.location.hostname}:9090`
 };
 
 shadeInjector.useOdata({
@@ -25,7 +27,12 @@ motors
   .getService()
   .query()
   .exec()
-  .then(m => console.log("Motors Query:", m.value.map(motor => motor)));
+  .then(m =>
+    console.log(
+      "Motors Query:",
+      m.value.map(motor => motor)
+    )
+  );
 
 motors
   .getValue(1)
