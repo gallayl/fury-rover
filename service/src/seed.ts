@@ -73,7 +73,7 @@ export const seed = async (injector: Injector) => {
   }
 
   const motorStore = sm.getStoreFor(Motor);
-  for (let i = 0; i < 4; i++) {
+  for (let i = 1; i <= 4; i++) {
     await getOrCreate(
       { filter: { id: i } },
       { id: i, value: 0 },

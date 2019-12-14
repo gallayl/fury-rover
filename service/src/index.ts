@@ -58,8 +58,8 @@ export const i = new Injector()
   .useHttpApi({
     corsOptions: {
       credentials: true,
-      origins: ["http://localhost:8080"],
-      headers: ["cache", "content-type"]
+      origins: ["http://localhost:8080", "http://192.168.0.150"],
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH" as any]
     }
   })
   .useHttpAuthentication({
@@ -207,6 +207,18 @@ export const i = new Injector()
                   );
                   return JsonResult({ result: "ok" });
                 }
+              },
+              {
+                name: "set4",
+                returnType: EdmType.Unknown,
+                isBound: true,
+                action: async injector => {
+                  const body = await injector.getRequest().readPostBody<{
+                    values: [number, number, number, number];
+                  }>();
+                  injector.getInstance(MotorService).set4(body.values);
+                  return JsonResult({ result: "ok" });
+                }
               }
             ],
             functions: [
@@ -253,6 +265,8 @@ export const i = new Injector()
     mqttPort: 1883,
     aedesSettings: {}
   });
+
+i.getInstance(MotorService);
 
 registerExitHandler(i);
 seed(i);

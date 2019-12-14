@@ -20,10 +20,16 @@ export class MotorService {
       data += d;
     });
 
-    this.pyService.stdout.on("error", d => {
+    this.pyService.stderr.on("data", d => {
       this.logger.warning({ message: `Data: ${d}` });
       data += d;
     });
+
+    this.pyService.stdout.on("error", d => {
+      this.logger.warning({ message: `Error: ${d}` });
+      data += d;
+    });
+
     this.pyService.stdout.on("end", () => {
       this.msgFromPy.setValue(data);
       data = "";
@@ -50,17 +56,30 @@ export class MotorService {
     this.pyService.stdin.writable && this.pyService.stdin.write(`stopAll\n`);
   }
 
+  public set4(values: [number, number, number, number]) {
+    this.pyService.stdin.writable &&
+      this.pyService.stdin.write(
+        `set4 ${values
+          .map(v => Math.min(v, 1))
+          .map(v => Math.max(-1, v))
+          .join(" ")}\n`
+      );
+  }
+
   private readonly logger: ScopedLogger;
 
   constructor(injector: Injector) {
     this.logger = injector.logger.withScope(
       "@furystack-quad/PythonMotorService"
     );
-    const path = join(process.cwd(), "PythonMotorService.py");
+    const path = join(process.cwd(), "MotorService.py");
     this.logger.verbose({
       message: `Spawning Python process with file ${path}`
     });
-    this.pyService = spawn("python", [path]);
+    this.pyService = spawn("python3", [path], {
+      cwd: process.cwd(),
+      env: process.env
+    });
     this.listenStdOut();
     this.msgFromPy.subscribe(value =>
       this.logger.debug({ message: `@Py: ${value}` })

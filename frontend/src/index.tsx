@@ -18,7 +18,10 @@ export const environmentOptions = {
 
 shadeInjector.useOdata({
   serviceEndpoint: PathHelper.joinPaths(environmentOptions.serviceUrl, "odata"),
-  defaultInit: {}
+  defaultInit: {
+    credentials: "include",
+    mode: "no-cors"
+  }
 });
 
 const motors = shadeInjector.getInstance(Motors);
@@ -42,11 +45,9 @@ motors
   .getAllValue()
   .then(resp => console.log("Motors getValue response: ", resp));
 
-motors
-  .stop(1, undefined)
-  .then(resp => console.log("Motors Stop response: ", resp));
+motors.stop(1).then(resp => console.log("Motors Stop response: ", resp));
 
-motors.stopAll({}).then(resp => console.log("Motors stopall response", resp));
+motors.stopAll().then(resp => console.log("Motors stopall response", resp));
 
 shadeInjector.useLogging(VerboseConsoleLogger);
 
