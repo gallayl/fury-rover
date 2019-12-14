@@ -16,10 +16,8 @@ export interface NippleComponentProps {
 }
 
 export const NippleComponent = Shade<NippleComponentProps>({
-  construct: async ({ element, props }) => {
-    const nippleElement: HTMLDivElement | null = element.getElementsByTagName(
-      "div"
-    )[0];
+  constructed: async ({ element, props }) => {
+    const nippleElement = element.children[0] as HTMLDivElement;
     if (!nippleElement) {
       return;
     }
