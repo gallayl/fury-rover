@@ -1,9 +1,27 @@
-import { createComponent, Router, Shade, LazyLoad } from "@furystack/shades";
-import { HomePage } from "../pages/home";
+import { createComponent, Shade, Router } from "@furystack/shades";
+import { SessionService, sessionState } from "../services/session";
+import { User } from "../odata/entity-types";
+import { Init, FirstPersonView, Offline, Login } from "../pages";
 
 export const Body = Shade({
   shadowDomName: "shade-app-body",
-  render: () => {
+  initialState: {
+    sessionState: "initial" as sessionState,
+    currentUser: null as User | null
+  },
+  constructed: async ({ injector, updateState }) => {
+    const session = injector.getInstance(SessionService);
+    const observables = [
+      session.state.subscribe(newState =>
+        updateState({
+          sessionState: newState
+        })
+      ),
+      session.currentUser.subscribe(usr => updateState({ currentUser: usr }))
+    ];
+    return () => observables.forEach(o => o.dispose());
+  },
+  render: ({ getState }) => {
     return (
       <div
         id="Body"
@@ -14,27 +32,37 @@ export const Body = Shade({
           top: "40px",
           width: "calc(100% - 40px)",
           height: "calc(100% - 80px)",
-          overflow: "auto"
+          overflow: "hidden"
         }}
       >
-        <Router
-          routeMatcher={(current, component) => current.pathname === component}
-          routes={[
-            { url: "/", component: () => <HomePage /> },
-            {
-              url: "/fpv",
-              component: () => (
-                <LazyLoad
-                  loader={<div>Loading...</div>}
-                  component={async () => {
-                    const fpvModule = await import("../pages/fpv");
-                    return <fpvModule.FirstPersonView />;
-                  }}
+        {(() => {
+          switch (getState().sessionState) {
+            case "authenticated":
+              return (
+                <Router
+                  routeMatcher={(current, component) =>
+                    current.pathname === component
+                  }
+                  notFound={() => <div>Route not found</div>}
+                  routes={[{ url: "/", component: () => <FirstPersonView /> }]}
+                ></Router>
+              );
+            case "offline":
+              return <Offline />;
+            case "unauthenticated":
+              return (
+                <Router
+                  routeMatcher={(current, component) =>
+                    current.pathname === component
+                  }
+                  notFound={() => <div>Route not found</div>}
+                  routes={[{ url: "/", component: () => <Login /> }]}
                 />
-              )
-            }
-          ]}
-        />
+              );
+            default:
+              return <Init />;
+          }
+        })()}
       </div>
     );
   }

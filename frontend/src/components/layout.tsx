@@ -1,10 +1,12 @@
 import { createComponent, Shade } from "@furystack/shades";
+import { SessionService } from "../services/session";
 import { Body } from "./body";
 import { Header } from "./header";
+import { Button } from "./common";
 
 export const Layout = Shade({
   shadowDomName: "shade-app-layout",
-  render: () => {
+  render: ({ injector }) => {
     return (
       <div
         id="Layout"
@@ -23,12 +25,25 @@ export const Layout = Shade({
         className="eee"
       >
         <Header
-          title="🦇 Shades Demo"
+          title="🌀 Multiverse"
           links={[
-            { name: "👀 FPV", url: "/fpv" },
-            { name: "😷 Stats", url: "/stats" }
+            {
+              name: "FPV",
+              url: "/"
+            }
           ]}
-        />
+        >
+          <div style={{ flex: "1" }} />
+          <Button
+            value="Logout"
+            style={{ marginRight: "2em", color: "white" }}
+            onclick={() => {
+              injector.getInstance(SessionService).logout();
+            }}
+          >
+            Logout
+          </Button>
+        </Header>
         <Body />
       </div>
     );

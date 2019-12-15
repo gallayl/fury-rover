@@ -7,7 +7,8 @@ import {
   LogoutAction,
   GetCurrentUser,
   HttpUserContext,
-  JsonResult
+  JsonResult,
+  IsAuthenticated
 } from "@furystack/http-api";
 import "@furystack/typeorm-store";
 import { EdmType } from "@furystack/odata";
@@ -187,7 +188,24 @@ export const i = new Injector()
               {
                 action: GetCurrentUser,
                 name: "current"
+              },
+              {
+                action: IsAuthenticated,
+                name: "isAuthenticated",
+                returnType: Object
               }
+            ],
+            actions: [
+              {
+                action: LoginAction,
+                name: "login",
+                parameters: [
+                  { name: "username", type: EdmType.String, nullable: false },
+                  { name: "password", type: EdmType.String, nullable: false }
+                ],
+                returnType: User
+              },
+              { action: LogoutAction, name: "logout" }
             ]
           })
           .addCollection({

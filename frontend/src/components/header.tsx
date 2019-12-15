@@ -1,4 +1,5 @@
 import { createComponent, RouteLink, Shade } from "@furystack/shades";
+import { AppBar } from "./common";
 
 export interface HeaderProps {
   title: string;
@@ -12,27 +13,9 @@ const urlStyle: Partial<CSSStyleDeclaration> = {
 
 export const Header = Shade<HeaderProps>({
   shadowDomName: "shade-app-header",
-  render: ({ props }) => {
+  render: ({ props, children }) => {
     return (
-      <div
-        id="header"
-        style={{
-          width: "100%",
-          minHeight: "2em",
-          background: "#222",
-          color: "white",
-          display: "flex",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          boxShadow: "0 0 3px rgba(0,0,0,0.6)",
-          animationName: "glow",
-          animationDuration: "3s",
-          animationIterationCount: "infinite",
-          animationTimingFunction: "linear",
-          animationDirection: "alternate",
-          padding: "8px"
-        }}
-      >
+      <AppBar>
         <h3 style={{ margin: "0 2em 0 0", cursor: "pointer" }}>
           <RouteLink title={props.title} href="/" style={urlStyle}>
             {props.title}
@@ -47,7 +30,8 @@ export const Header = Shade<HeaderProps>({
             {link.name || ""}
           </RouteLink>
         ))}
-      </div>
+        {children}
+      </AppBar>
     );
   }
 });
