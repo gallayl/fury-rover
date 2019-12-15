@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { join } from "path";
 import { Injectable, Injector } from "@furystack/inject";
 import { ScopedLogger } from "@furystack/logging";
-import { ObservableValue } from "@furystack/utils";
+import { ObservableValue, Retrier } from "@furystack/utils";
 
 /**
  * Service class for Adafruit Motor HAT
@@ -42,28 +42,41 @@ export class MotorService {
     });
   }
 
+  private async writeToPy(value: string) {
+    await Retrier.create(async () => this.pyService.stdin.writable).setup({
+      RetryIntervalMs: 1,
+      Retries: 5,
+      onFail: () =>
+        this.logger.warning({ message: "Failed to write to stdin." })
+    });
+    this.pyService.stdin.write(`${value}\n`);
+  }
+
   public setMotorValue(motorId: number, motorValue: number) {
-    this.pyService.stdin.writable &&
-      this.pyService.stdin.write(`set ${motorId} ${motorValue}\n`);
+    this.writeToPy(`set ${motorId} ${motorValue}`);
   }
 
   public setAll(motorValue: number) {
-    this.pyService.stdin.writable &&
-      this.pyService.stdin.write(`setAll ${motorValue}\n`);
+    this.writeToPy(`setAll ${motorValue}`);
   }
 
   public stopAll() {
-    this.pyService.stdin.writable && this.pyService.stdin.write(`stopAll\n`);
+    this.writeToPy(`stopAll`);
   }
 
   public set4(values: [number, number, number, number]) {
-    this.pyService.stdin.writable &&
-      this.pyService.stdin.write(
-        `set4 ${values
-          .map(v => Math.min(v, 1))
-          .map(v => Math.max(-1, v))
-          .join(" ")}\n`
-      );
+    this.writeToPy(
+      `set4 ${values
+        .map(v => Math.min(v, 1))
+        .map(v => Math.max(-1, v))
+        .join(" ")}`
+    );
+  }
+
+  public setServos(servoValues: Array<{ id: number; value: number }>) {
+    this.writeToPy(
+      `servo ${servoValues.map(v => `${v.id}=${v.value}`).join(";")}`
+    );
   }
 
   private readonly logger: ScopedLogger;

@@ -4,7 +4,7 @@ import { createComponent, shadeInjector } from "@furystack/shades";
 import { VerboseConsoleLogger } from "@furystack/logging";
 import { Layout } from "./components/layout";
 import "@furystack/odata-fetchr";
-import { Motors } from "./odata/entity-collections";
+import { Motors, Servos } from "./odata/entity-collections";
 
 export const environmentOptions = {
   nodeEnv: process.env.NODE_ENV as "development" | "production",
@@ -25,29 +25,13 @@ shadeInjector.useOdata({
 });
 
 const motors = shadeInjector.getInstance(Motors);
+const servos = shadeInjector.getInstance(Servos);
 
-motors
-  .getService()
-  .query()
-  .exec()
-  .then(m =>
-    console.log(
-      "Motors Query:",
-      m.value.map(motor => motor)
-    )
-  );
-
-motors
-  .getValue(1)
-  .then(resp => console.log("Motors getValue response: ", resp));
-
-motors
-  .getAllValue()
-  .then(resp => console.log("Motors getValue response: ", resp));
-
-motors.stop(1).then(resp => console.log("Motors Stop response: ", resp));
-
-motors.stopAll().then(resp => console.log("Motors stopall response", resp));
+motors.stopAll().then(resp => console.log("Motors stopped", resp));
+servos.setValues([
+  { id: 0, value: 45 },
+  { id: 1, value: 0 }
+]);
 
 shadeInjector.useLogging(VerboseConsoleLogger);
 

@@ -30,7 +30,7 @@ export class Motors {
     this.getService().execCustomCollectionFunction<unknown>("getAllValue");
 
   /**
-   * Custom action 'stop'
+   * Custom action 'Set4'
    */
   public set4 = (values: [number, number, number, number]) =>
     this.getService().execCustomCollectionAction("set4", {

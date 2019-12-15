@@ -83,7 +83,13 @@ export const i = new Injector()
           isAllowed: false,
           message:
             "Cannot add an entity into a prepopulated hardware collection"
-        })
+        }),
+        onEntityUpdated: async ({ injector, id, change }) => {
+          change.currentValue &&
+            injector
+              .getInstance(MotorService)
+              .setServos([{ id, value: change.currentValue }]);
+        }
       })
       .createDataSet(Motor, {
         name: "motors",
@@ -242,7 +248,21 @@ export const i = new Injector()
           })
           .addCollection({
             model: Servo,
-            name: "servos"
+            name: "servos",
+            actions: [
+              {
+                name: "setValues",
+                isBound: true,
+                returnType: EdmType.Unknown,
+                action: async injector => {
+                  const body = await injector.getRequest().readPostBody<{
+                    values: Array<{ id: number; value: number }>;
+                  }>();
+                  injector.getInstance(MotorService).setServos(body.values);
+                  return JsonResult({ ok: true });
+                }
+              }
+            ]
           })
       );
 

@@ -2,14 +2,22 @@ import sys
 import string
 from adafruit_motorkit import MotorKit
 # ToDo:
-# from adafruit_servokit import ServoKit
-# servoKit = ServoKit(channels=16)
+from adafruit_servokit import ServoKit
+servoKit = ServoKit(channels=16)
 
 kit = MotorKit(address=0x6f)
 
 while True:
     try:
         line = sys.stdin.readline()
+        #format: servo 1=15;2=25;
+        if (line.startswith("servo ")):
+            [command, servos] = line.split(' ')
+            servoValues = servos.split(';')
+            for servo in servoValues:
+                [servoIdStr, servoValueStr] = servo.split('=')
+                servoKit.servo[int(servoIdStr)].angle = int(servoValueStr)
+            continue
         if (line.startswith("set ")):
             [command, motorString, valueString] = line.split(' ')
             [motorId, value] = [int(motorString), float(valueString)]

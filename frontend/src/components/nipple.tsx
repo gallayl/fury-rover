@@ -16,6 +16,7 @@ export interface NippleComponentProps {
 }
 
 export const NippleComponent = Shade<NippleComponentProps>({
+  shadowDomName: "shade-nipple",
   constructed: async ({ element, props }) => {
     const nippleElement = element.children[0] as HTMLDivElement;
     if (!nippleElement) {
@@ -30,14 +31,15 @@ export const NippleComponent = Shade<NippleComponentProps>({
     props.onMove && manager.on("move", props.onMove);
     return () => manager.destroy();
   },
-  render: ({ props, children }) => {
+  render: ({ children, props, element }) => {
+    props.style && Object.assign(element.style, props.style);
     return (
       <div
         style={{
           width: "100%",
           height: "100%",
-          position: "relative",
-          ...props.style
+          position: "relative"
+          // ...props.style
         }}
       >
         {children}
