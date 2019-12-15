@@ -14,12 +14,9 @@ import { EdmType } from "@furystack/odata";
 import { DataSetSettings } from "@furystack/repository";
 import { routing } from "./routing";
 import { seed } from "./seed";
-import { User, Session } from "./models";
+import { User, Session, Servo, Motor } from "./models";
 import { registerExitHandler } from "./exitHandler";
-import "./mqtt-injector-extensions";
-import { Servo } from "./models/servo";
-import { Motor } from "./models/motor";
-import { MotorService } from "./services/motor-service";
+import { MotorService } from "./services";
 
 export const authorizedOnly = async (options: { injector: Injector }) => {
   const authorized = await options.injector
@@ -280,11 +277,7 @@ export const i = new Injector()
 
       return ns;
     })
-  )
-  .setupMqtt({
-    mqttPort: 1883,
-    aedesSettings: {}
-  });
+  );
 
 i.getInstance(MotorService);
 

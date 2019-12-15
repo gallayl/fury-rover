@@ -1,10 +1,10 @@
 import { parse } from "url";
 import { RouteModel } from "@furystack/http-api";
-import { GetSystemLoadAction } from "./actions/get-system-load";
-import { GetSystemDetailsAction } from "./actions/get-system-details";
-import { StreamVideoAction } from "./actions/stream-video";
-import { GetReleaseInfoAction } from "./actions/get-release-info";
-import { WakeOnLanAction } from "./actions/wake-on-lan";
+import {
+  GetSystemDetailsAction,
+  GetSystemLoadAction,
+  WakeOnLanAction
+} from "./actions";
 
 export const routing: RouteModel = injector => {
   // Moved stuff to OData
@@ -22,10 +22,6 @@ export const routing: RouteModel = injector => {
         return GetSystemLoadAction;
       case "/getSystemDetails":
         return GetSystemDetailsAction;
-      case "/video":
-        return StreamVideoAction;
-      case "/releaseInfo":
-        return GetReleaseInfoAction;
       default:
         break;
     }
