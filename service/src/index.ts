@@ -41,15 +41,24 @@ export const i = new Injector()
   .useLogging(VerboseConsoleLogger)
   .useTypeOrm({
     type: "sqlite",
-    database: join(process.cwd(), "data.sqlite"),
-    entities: [User, Session],
+    database: join(process.cwd(), "users.sqlite"),
+    entities: [User],
     logging: false,
-    synchronize: true
+    synchronize: true,
+    name: "users"
+  })
+  .useTypeOrm({
+    type: "sqlite",
+    database: join(process.cwd(), "sessions.sqlite"),
+    entities: [Session],
+    logging: false,
+    synchronize: true,
+    name: "session"
   })
   .setupStores(stores =>
     stores
-      .useTypeOrmStore(User)
-      .useTypeOrmStore(Session)
+      .useTypeOrmStore(User, "users")
+      .useTypeOrmStore(Session, "session")
       .addStore(new InMemoryStore({ model: Motor, primaryKey: "id" }))
       .addStore(new InMemoryStore({ model: Servo, primaryKey: "channel" }))
   )
