@@ -1,5 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { JoystickOutputData } from 'nipplejs'
+import Semaphore from 'semaphore-async-await'
 import { NippleComponent } from '../components/nipple'
 import { Motors, Servos } from '../odata/entity-collections'
 
@@ -9,25 +10,33 @@ export interface FirstPersonViewState {
 }
 
 const VECTOR_MULTIPLIER = 0.1
+const UPDATE_TIMEOUT = 50
+
+const updateLock = new Semaphore(1)
 
 export const FirstPersonView = Shade<any, FirstPersonViewState>({
   shadowDomName: 'shade-first-person-view',
   initialState: {},
-  constructed: async ({ getState, updateState, injector }) => {
-    const interval = setInterval(() => {
+  constructed: ({ getState, updateState, injector }) => {
+    const interval = setInterval(async () => {
       const currentState = getState()
       if (currentState.lastSentData !== currentState.data) {
-        if (currentState.data) {
-          const mul = VECTOR_MULTIPLIER * currentState.data.force
-          const vectorX = currentState.data.vector && currentState.data.vector.x
-          const vectorY = currentState.data.vector && currentState.data.vector.y
-          const leftThrottle = mul * vectorY - mul * vectorX || 0
-          const rightThrottle = mul * vectorY + mul * vectorX || 0
-          updateState({ lastSentData: currentState.data }, true)
-          injector.getInstance(Motors).set4([leftThrottle, leftThrottle, rightThrottle, rightThrottle])
+        if (currentState.data && updateLock.getPermits()) {
+          try {
+            await updateLock.acquire()
+            const mul = VECTOR_MULTIPLIER * currentState.data.force
+            const vectorX = currentState.data.vector && currentState.data.vector.x
+            const vectorY = currentState.data.vector && currentState.data.vector.y
+            const leftThrottle = mul * vectorY - mul * vectorX || 0
+            const rightThrottle = mul * vectorY + mul * vectorX || 0
+            updateState({ lastSentData: currentState.data }, true)
+            await injector.getInstance(Motors).set4([leftThrottle, leftThrottle, rightThrottle, rightThrottle])
+          } finally {
+            updateLock.release()
+          }
         }
       }
-    }, 100)
+    }, UPDATE_TIMEOUT)
     return () => {
       clearInterval(interval)
     }
