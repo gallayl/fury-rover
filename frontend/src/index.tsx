@@ -1,10 +1,13 @@
 /** ToDo: Main entry point */
 import { PathHelper } from '@furystack/utils'
-import { createComponent, shadeInjector } from '@furystack/shades'
+import { Injector } from '@furystack/inject'
+import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { VerboseConsoleLogger } from '@furystack/logging'
 import { Layout } from './components/layout'
 import '@furystack/odata-fetchr'
 import { Motors, Servos } from './odata/entity-collections'
+
+const shadeInjector = new Injector()
 
 export const environmentOptions = {
   nodeEnv: process.env.NODE_ENV as 'development' | 'production',
@@ -38,5 +41,9 @@ shadeInjector.logger.withScope('Startup').verbose({
   data: { environmentOptions },
 })
 
-const root: HTMLDivElement = document.getElementById('root') as HTMLDivElement
-root.appendChild(<Layout />)
+const rootElement: HTMLDivElement = document.getElementById('root') as HTMLDivElement
+initializeShadeRoot({
+  rootElement,
+  injector: shadeInjector,
+  jsxElement: <Layout />,
+})
