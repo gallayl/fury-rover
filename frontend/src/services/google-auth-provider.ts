@@ -1,8 +1,8 @@
-import { Retrier } from "@furystack/utils";
-import { Injector } from "@furystack/inject/dist/Injector";
-import { Injectable } from "@furystack/inject";
-import { Users } from "../odata/entity-collections";
-import { SessionService } from "./session";
+import { Retrier } from '@furystack/utils'
+import { Injector } from '@furystack/inject/dist/Injector'
+import { Injectable } from '@furystack/inject'
+import { Users } from '../odata/entity-collections'
+import { SessionService } from './session'
 
 /**
  * Options for Google OAuth Authentication
@@ -11,18 +11,18 @@ export class GoogleAuthenticationOptions {
   /**
    * Defines the Redirect Uri. Will fall back to 'window.location.origin', if not provided
    */
-  public redirectUri!: string;
+  public redirectUri!: string
   /**
    * Scope settings for Google Oauth
    * Visit the following link to read more about Google Scopes:
    * https://developers.google.com/identity/protocols/googlescopes
    */
-  public scope: string[] = ["email", "profile"];
+  public scope: string[] = ['email', 'profile']
   /**
    * Your application's ClientId, provided by Google
    */
-  public clientId!: string;
-  public windowInstance = window;
+  public clientId!: string
+  public windowInstance = window
 }
 
 /**
@@ -55,7 +55,7 @@ export class GoogleOauthProvider {
    * Disposes the OAuth provider
    */
   public dispose() {
-    this.iframe = null as any;
+    this.iframe = null as any
   }
   /**
    * Logs in the User with Google OAuth. Tries to retrieve the Token, if not provided.
@@ -64,19 +64,19 @@ export class GoogleOauthProvider {
    */
   public async login() {
     try {
-      this.session.isOperationInProgress.setValue(true);
-      const token = await this.getToken();
-      const user = await this.usersService.googleLogin({ token });
+      this.session.isOperationInProgress.setValue(true)
+      const token = await this.getToken()
+      const user = await this.usersService.googleLogin({ token })
       if (user) {
-        this.session.currentUser.setValue(user);
-        this.session.state.setValue("authenticated");
+        this.session.currentUser.setValue(user)
+        this.session.state.setValue('authenticated')
       }
     } finally {
-      this.session.isOperationInProgress.setValue(false);
+      this.session.isOperationInProgress.setValue(false)
     }
   }
 
-  private popup!: Window | null;
+  private popup!: Window | null
 
   /**
    * Gets the Token from a child window.
@@ -87,21 +87,19 @@ export class GoogleOauthProvider {
     return new Promise<string>((resolve, reject) => {
       this.popup = this.options.windowInstance.open(
         loginReqUrl,
-        "_blank",
-        "toolbar=no,scrollbars=no,resizable=no,top=200,left=300,width=400,height=400",
-        true
-      );
+        '_blank',
+        'toolbar=no,scrollbars=no,resizable=no,top=200,left=300,width=400,height=400',
+        true,
+      )
       const timer = setInterval(() => {
         if (this.popup && this.popup.window) {
           try {
             if (this.popup.window.location.href !== loginReqUrl) {
-              const token = this.getGoogleTokenFromUri(
-                this.popup.window.location
-              );
+              const token = this.getGoogleTokenFromUri(this.popup.window.location)
               if (token) {
-                resolve(token);
-                this.popup.close();
-                clearInterval(timer);
+                resolve(token)
+                this.popup.close()
+                clearInterval(timer)
               }
             }
           } catch (error) {
@@ -109,14 +107,14 @@ export class GoogleOauthProvider {
           }
         } else {
           // Popup closed
-          reject(Error("The popup has been closed"));
-          clearInterval(timer);
+          reject(Error('The popup has been closed'))
+          clearInterval(timer)
         }
-      }, 50);
-    });
+      }, 50)
+    })
   }
 
-  private iframe!: HTMLIFrameElement;
+  private iframe!: HTMLIFrameElement
 
   /**
    * Tries to retrieve an id_token w/o user interaction
@@ -125,43 +123,40 @@ export class GoogleOauthProvider {
    */
   private async getTokenSilent(loginUrl: string): Promise<string> {
     if (this.iframe) {
-      throw Error("Getting token already in progress");
+      throw Error('Getting token already in progress')
     }
 
     const token = await new Promise<string>((resolve, reject) => {
-      this.iframe = this.options.windowInstance.document.createElement(
-        "iframe"
-      );
-      this.iframe.style.display = "none";
-      this.iframe.setAttribute("sandbox", "allow-same-origin allow-scripts");
+      this.iframe = this.options.windowInstance.document.createElement('iframe')
+      this.iframe.style.display = 'none'
+      this.iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts')
 
       this.iframe.onload = async ev => {
-        let location: Location | null = null;
+        let location: Location | null = null
         await Retrier.create(async () => {
           try {
             // eslint-disable-next-line prefer-destructuring
-            location = ((ev.srcElement as HTMLIFrameElement)
-              .contentDocument as Document).location;
-            return true;
+            location = ((ev.srcElement as HTMLIFrameElement).contentDocument as Document).location
+            return true
           } catch (error) {
-            return false;
+            return false
           }
         })
           .setup({
-            timeoutMs: 500
+            timeoutMs: 500,
           })
-          .run();
+          .run()
 
-        const iframeToken = location && this.getGoogleTokenFromUri(location);
-        iframeToken ? resolve(iframeToken) : reject(Error("Token not found"));
-        this.options.windowInstance.document.body.removeChild(this.iframe);
-        this.iframe = undefined as any;
-      };
-      this.iframe.src = loginUrl;
-      this.options.windowInstance.document.body.appendChild(this.iframe);
-    });
+        const iframeToken = location && this.getGoogleTokenFromUri(location)
+        iframeToken ? resolve(iframeToken) : reject(Error('Token not found'))
+        this.options.windowInstance.document.body.removeChild(this.iframe)
+        this.iframe = undefined as any
+      }
+      this.iframe.src = loginUrl
+      this.options.windowInstance.document.body.appendChild(this.iframe)
+    })
 
-    return token;
+    return token
   }
 
   /**
@@ -169,13 +164,13 @@ export class GoogleOauthProvider {
    * @returns {Promise<string>} A promise that will be resolved with an id_token, or will be rejected in case of errors or if the dialog closes
    */
   public async getToken(): Promise<string> {
-    const loginReqUrl = this.getGoogleLoginUrl();
+    const loginReqUrl = this.getGoogleLoginUrl()
     try {
-      return await this.getTokenSilent(loginReqUrl);
+      return await this.getTokenSilent(loginReqUrl)
     } catch (error) {
       /** Cannot get token */
     }
-    return await this.getTokenFromPrompt(loginReqUrl);
+    return await this.getTokenFromPrompt(loginReqUrl)
   }
 
   /**
@@ -187,10 +182,10 @@ export class GoogleOauthProvider {
       `https://accounts.google.com/o/oauth2/v2/auth` +
       `?response_type=id_token` +
       `&redirect_uri=${encodeURIComponent(this.options.redirectUri)}` +
-      `&scope=${encodeURIComponent(this.options.scope.join(" "))}` +
+      `&scope=${encodeURIComponent(this.options.scope.join(' '))}` +
       `&client_id=${encodeURIComponent(this.options.clientId)}` +
       `&nonce=${Math.random().toString()}`
-    );
+    )
   }
 
   /**
@@ -199,14 +194,12 @@ export class GoogleOauthProvider {
    * @returns { string | null } The extracted id_token
    */
   public getGoogleTokenFromUri(uri: Location): string | null {
-    const tokenSegmentPrefix = "#id_token=";
-    const tokenSegment = uri.hash
-      .split("&")
-      .find(segment => segment.indexOf(tokenSegmentPrefix) === 0);
+    const tokenSegmentPrefix = '#id_token='
+    const tokenSegment = uri.hash.split('&').find(segment => segment.indexOf(tokenSegmentPrefix) === 0)
     if (tokenSegment) {
-      return tokenSegment.replace(tokenSegmentPrefix, "");
+      return tokenSegment.replace(tokenSegmentPrefix, '')
     }
-    return null;
+    return null
   }
 
   /**
@@ -217,29 +210,22 @@ export class GoogleOauthProvider {
   constructor(
     private readonly options: GoogleAuthenticationOptions,
     private readonly usersService: Users,
-    private readonly session: SessionService
+    private readonly session: SessionService,
   ) {}
 }
 
-declare module "@furystack/inject/dist/Injector" {
+declare module '@furystack/inject/dist/Injector' {
   interface Injector {
-    useGoogleAuth(
-      options: Partial<GoogleAuthenticationOptions> & { clientId: string }
-    ): Injector;
+    useGoogleAuth(options: Partial<GoogleAuthenticationOptions> & { clientId: string }): Injector
   }
 }
 
-Injector.prototype.useGoogleAuth = function(
-  options: GoogleAuthenticationOptions
-) {
-  const newOptions = new GoogleAuthenticationOptions();
+Injector.prototype.useGoogleAuth = function(options: GoogleAuthenticationOptions) {
+  const newOptions = new GoogleAuthenticationOptions()
 
   if (!options.redirectUri) {
-    options.redirectUri = `${window.location.origin}/`;
+    options.redirectUri = `${window.location.origin}/`
   }
-  this.setExplicitInstance(
-    Object.assign(newOptions, options),
-    GoogleAuthenticationOptions
-  );
-  return this;
-};
+  this.setExplicitInstance(Object.assign(newOptions, options), GoogleAuthenticationOptions)
+  return this
+}

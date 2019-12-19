@@ -1,14 +1,13 @@
-import { Shade, createComponent, PartialElement } from "@furystack/shades";
+import { Shade, createComponent, PartialElement } from '@furystack/shades'
 
 export const Loader = Shade<{ style?: PartialElement<CSSStyleDeclaration> }>({
-  shadowDomName: "shade-loader",
+  shadowDomName: 'shade-loader',
   render: ({ props }) => {
     return (
       <div
         style={{
-          ...props.style
-        }}
-      >
+          ...props.style,
+        }}>
         <style>
           {`/* LOADER 1 */
 
@@ -49,16 +48,15 @@ export const Loader = Shade<{ style?: PartialElement<CSSStyleDeclaration> }>({
         </style>
         <div
           style={{
-            position: "relative",
-            width: "100%",
-            height: "100%"
-          }}
-        >
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+          }}>
           <div className="three col">
             <div className="loader" id="loader-1"></div>
           </div>
         </div>
       </div>
-    );
-  }
-});
+    )
+  },
+})

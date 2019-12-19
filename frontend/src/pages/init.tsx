@@ -1,17 +1,16 @@
-import { Shade, createComponent } from "@furystack/shades";
-import { Loader } from "../components/loader";
+import { Shade, createComponent } from '@furystack/shades'
+import { Loader } from '../components/loader'
 
 export const Init = Shade({
-  shadowDomName: "shade-init",
+  shadowDomName: 'shade-init',
   render: () => (
     <div
       style={{
-        display: "flex",
-        height: "100%",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
+        display: 'flex',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
       <style>{`
       @keyframes show{
         0%{
@@ -31,20 +30,19 @@ export const Init = Shade({
       <div
         className="initLoader"
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
         <Loader
           style={{
-            width: "128px",
-            height: "128px"
+            width: '128px',
+            height: '128px',
           }}
         />
         <h2>Initializing app...</h2>
       </div>
     </div>
-  )
-});
+  ),
+})

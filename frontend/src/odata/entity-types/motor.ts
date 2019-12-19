@@ -3,8 +3,8 @@
  * Primary key: 'id'
  */
 export class Motor {
-  public id!: number;
-  public isReversed!: boolean;
-  public multiplier!: number;
-  public value!: number;
+  public id!: number
+  public isReversed!: boolean
+  public multiplier!: number
+  public value!: number
 }

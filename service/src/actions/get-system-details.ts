@@ -1,14 +1,9 @@
-import { platform, type, release, hostname } from "os";
-import { cpu, mem, diskLayout, fsSize } from "systeminformation";
-import { RequestAction, JsonResult } from "@furystack/http-api";
+import { platform, type, release, hostname } from 'os'
+import { cpu, mem, diskLayout, fsSize } from 'systeminformation'
+import { RequestAction, JsonResult } from '@furystack/http-api'
 
 export const GetSystemDetailsAction: RequestAction = async () => {
-  const [cpuValue, memValue, diskLayoutValue, fsSizeValue] = await Promise.all([
-    cpu(),
-    mem(),
-    diskLayout(),
-    fsSize()
-  ]);
+  const [cpuValue, memValue, diskLayoutValue, fsSizeValue] = await Promise.all([cpu(), mem(), diskLayout(), fsSize()])
 
   const responseBody = {
     platform: platform(),
@@ -18,8 +13,8 @@ export const GetSystemDetailsAction: RequestAction = async () => {
     hostname: hostname(),
     mem: memValue,
     diskLayout: diskLayoutValue,
-    fsSize: fsSizeValue
-  };
+    fsSize: fsSizeValue,
+  }
 
-  return JsonResult(responseBody);
-};
+  return JsonResult(responseBody)
+}

@@ -3,5 +3,5 @@
  * Primary key: 'username'
  */
 export class User {
-  public username!: string;
+  public username!: string
 }
