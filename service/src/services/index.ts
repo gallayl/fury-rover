@@ -1,2 +1,1 @@
-export * from "./motor-service";
-export * from "./movement-service";
+export * from './motor-service'

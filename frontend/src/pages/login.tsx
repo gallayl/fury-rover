@@ -1,65 +1,59 @@
-import { Shade, createComponent, RouteLink } from "@furystack/shades";
-import { Button, Input } from "../components/common";
-import { SessionService } from "../services/session";
-import { Loader } from "../components/loader";
-import { GoogleOauthProvider } from "../services/google-auth-provider";
+import { Shade, createComponent, RouteLink } from '@furystack/shades'
+import { Button, Input } from '../components/common'
+import { SessionService } from '../services/session'
+import { Loader } from '../components/loader'
+import { GoogleOauthProvider } from '../services/google-auth-provider'
 
 export const Login = Shade({
-  shadowDomName: "shade-login",
+  shadowDomName: 'shade-login',
   initialState: {
-    username: "",
-    password: "",
-    error: "",
-    isOperationInProgress: true
+    username: '',
+    password: '',
+    error: '',
+    isOperationInProgress: true,
   },
   constructed: ({ injector, updateState }) => {
-    const sessionService = injector.getInstance(SessionService);
+    const sessionService = injector.getInstance(SessionService)
     const subscriptions = [
-      sessionService.loginError.subscribe(
-        error => updateState({ error }),
-        true
-      ),
+      sessionService.loginError.subscribe(error => updateState({ error }), true),
       sessionService.isOperationInProgress.subscribe(
         isOperationInProgress => updateState({ isOperationInProgress }),
-        true
-      )
-    ];
-    return () => subscriptions.map(s => s.dispose());
+        true,
+      ),
+    ]
+    return () => subscriptions.map(s => s.dispose())
   },
   render: ({ injector, getState, updateState }) => {
-    const { error, username, password } = getState();
-    const sessinService = injector.getInstance(SessionService);
+    const { error, username, password } = getState()
+    const sessinService = injector.getInstance(SessionService)
 
     return (
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 100px"
-        }}
-      >
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '0 100px',
+        }}>
         <div>
           <form
             style={{
-              padding: "10px 30px"
+              padding: '10px 30px',
             }}
             className="login-form"
             onsubmit={ev => {
-              ev.preventDefault();
-              const state = getState();
-              sessinService.login(state.username, state.password);
-            }}
-          >
+              ev.preventDefault()
+              const state = getState()
+              sessinService.login(state.username, state.password)
+            }}>
             <h2
               style={{
-                color: "#444",
-                fontWeight: "lighter",
-                textAlign: "center"
-              }}
-            >
+                color: '#444',
+                fontWeight: 'lighter',
+                textAlign: 'center',
+              }}>
               It's good to see you!
             </h2>
             <Input
@@ -71,10 +65,10 @@ export const Login = Shade({
               onchange={ev => {
                 updateState(
                   {
-                    username: (ev.target as HTMLInputElement).value
+                    username: (ev.target as HTMLInputElement).value,
                   },
-                  true
-                );
+                  true,
+                )
               }}
               type="text"
             />
@@ -88,79 +82,65 @@ export const Login = Shade({
               onchange={ev => {
                 updateState(
                   {
-                    password: (ev.target as HTMLInputElement).value
+                    password: (ev.target as HTMLInputElement).value,
                   },
-                  true
-                );
+                  true,
+                )
               }}
             />
             <div
               style={{
-                padding: "1em 0"
-              }}
-            >
-              {error ? (
-                <div style={{ color: "red", fontSize: "12px" }}>{error}</div>
-              ) : (
-                <div />
-              )}
-              <Button
-                style={{ width: "100%" }}
-                disabled={getState().isOperationInProgress}
-                type="submit"
-              >
+                padding: '1em 0',
+              }}>
+              {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />}
+              <Button style={{ width: '100%' }} disabled={getState().isOperationInProgress} type="submit">
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative"
-                  }}
-                >
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                  }}>
                   Login
                   {getState().isOperationInProgress ? (
                     <Loader
                       style={{
-                        width: "12px",
-                        height: "12px",
-                        position: "absolute",
-                        top: "-2px"
+                        width: '12px',
+                        height: '12px',
+                        position: 'absolute',
+                        top: '-2px',
                       }}
                     />
                   ) : null}
                 </div>
               </Button>
             </div>
-            <p style={{ fontSize: "10px", textAlign: "center" }}>
-              You can also log in with
-            </p>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <p style={{ fontSize: '10px', textAlign: 'center' }}>You can also log in with</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Button
                 type="button"
                 onclick={async () => {
                   try {
-                    await injector.getInstance(GoogleOauthProvider).login();
+                    await injector.getInstance(GoogleOauthProvider).login()
                   } catch (e) {
-                    updateState({ error: e.body.error });
+                    updateState({ error: e.body.error })
                   }
-                }}
-              >
+                }}>
                 Google
               </Button>
-              <Button disabled style={{ margin: "0 .3em" }}>
+              <Button disabled style={{ margin: '0 .3em' }}>
                 Facebook
-              </Button>{" "}
+              </Button>{' '}
               <Button disabled>GitHub</Button>
             </div>
             <div
               style={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                fontSize: "10px",
-                marginTop: "1em",
-                textDecoration: "underline"
-              }}
-            >
+                display: 'flex',
+                justifyContent: 'space-evenly',
+                fontSize: '10px',
+                marginTop: '1em',
+                textDecoration: 'underline',
+              }}>
               <RouteLink href="/register">Sign up</RouteLink>
               <RouteLink href="/reset-password">Reset password</RouteLink>
               <RouteLink href="/contact">Contact</RouteLink>
@@ -169,6 +149,6 @@ export const Login = Shade({
           </form>
         </div>
       </div>
-    );
-  }
-});
+    )
+  },
+})

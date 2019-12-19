@@ -3,5 +3,5 @@
  * Primary key: 'channel'
  */
 export class Servo {
-  public currentValue!: number;
+  public currentValue!: number
 }
