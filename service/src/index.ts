@@ -1,6 +1,7 @@
 import { join } from 'path'
 import { InMemoryStore } from '@furystack/core'
 import { Injector } from '@furystack/inject'
+import { GoogleLoginAction } from '@furystack/auth-google'
 import { VerboseConsoleLogger } from '@furystack/logging'
 import {
   LoginAction,
@@ -198,6 +199,17 @@ export const i = new Injector()
                   { name: 'password', type: EdmType.String, nullable: false },
                 ],
                 returnType: User,
+              },
+              {
+                action: GoogleLoginAction,
+                name: 'googleLogin',
+                parameters: [
+                  {
+                    name: 'token',
+                    type: EdmType.String,
+                    nullable: false,
+                  },
+                ],
               },
               { action: LogoutAction, name: 'logout' },
             ],

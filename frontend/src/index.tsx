@@ -5,6 +5,8 @@ import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { VerboseConsoleLogger } from '@furystack/logging'
 import { Layout } from './components/layout'
 import '@furystack/odata-fetchr'
+import './services/google-auth-provider'
+
 import { Motors, Servos } from './odata/entity-collections'
 
 const shadeInjector = new Injector()
@@ -35,6 +37,10 @@ servos.setValues([
 ])
 
 shadeInjector.useLogging(VerboseConsoleLogger)
+
+shadeInjector.useGoogleAuth({
+  clientId: '626364599424-47aut7jidipmngkt4r7inda1erl8ckqg.apps.googleusercontent.com',
+})
 
 shadeInjector.logger.withScope('Startup').verbose({
   message: 'Initializing Shade Frontend...',

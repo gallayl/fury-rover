@@ -24,7 +24,7 @@ export const Layout = Shade({
         }}
         className="eee">
         <Header
-          title="🌀 Multiverse"
+          title="🚙 Fury-Rover"
           links={[
             {
               name: 'FPV',
