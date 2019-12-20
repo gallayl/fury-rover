@@ -64,4 +64,4 @@ dist
 *.tsbuildinfo
 frontend/bundle
 
-service/data.sqlite
+*.sqlite
