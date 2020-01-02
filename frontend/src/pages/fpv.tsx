@@ -7,6 +7,7 @@ import { Motors, Servos } from '../odata/entity-collections'
 export interface FirstPersonViewState {
   data?: JoystickOutputData
   lastSentData?: JoystickOutputData
+  sensitivity: number
 }
 
 const VECTOR_MULTIPLIER = 0.1
@@ -16,7 +17,9 @@ const updateLock = new Semaphore(1)
 
 export const FirstPersonView = Shade<any, FirstPersonViewState>({
   shadowDomName: 'shade-first-person-view',
-  initialState: {},
+  initialState: {
+    sensitivity: VECTOR_MULTIPLIER,
+  },
   constructed: ({ getState, updateState, injector }) => {
     const interval = setInterval(async () => {
       const currentState = getState()
@@ -93,7 +96,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
               }}>
               <img
                 src="/"
-                alt="alma"
+                alt="fpvScreen"
                 style={{
                   width: '100%',
                   height: '100%',

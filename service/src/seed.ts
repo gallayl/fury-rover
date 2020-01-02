@@ -52,6 +52,17 @@ export const seed = async (injector: Injector) => {
     injector,
   )
 
+  await getOrCreate(
+    { filter: { username: 'gallay.lajos@gmail.com' } },
+    {
+      username: 'gallay.lajos@gmail.com',
+      roles: ['demigod'],
+      password: '',
+    } as User,
+    userStore,
+    injector,
+  )
+
   const servoStore = sm.getStoreFor(Servo)
   const defaultServoValue = 90
 
