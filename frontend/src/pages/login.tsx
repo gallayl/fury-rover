@@ -1,8 +1,8 @@
-import { Shade, createComponent, RouteLink } from '@furystack/shades'
 import { Button, Input } from '../components/common'
 import { SessionService } from '../services/session'
 import { Loader } from '../components/loader'
 import { GoogleOauthProvider } from '../services/google-auth-provider'
+import { Shade, createComponent, RouteLink } from '@furystack/shades'
 
 export const Login = Shade({
   shadowDomName: 'shade-login',

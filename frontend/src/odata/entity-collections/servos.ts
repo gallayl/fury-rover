@@ -1,6 +1,6 @@
 import '@furystack/odata-fetchr'
-import { Injectable, Injector } from '@furystack/inject'
 import { Servo } from '../entity-types/servo'
+import { Injectable, Injector } from '@furystack/inject'
 
 /**
  * Service class for collection servos

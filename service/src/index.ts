@@ -1,8 +1,8 @@
 import { join } from 'path'
-import { InMemoryStore } from '@furystack/core'
-import { Injector } from '@furystack/inject'
-import { GoogleLoginAction } from '@furystack/auth-google'
-import { VerboseConsoleLogger } from '@furystack/logging'
+import { routing } from './routing'
+import { seed } from './seed'
+import { User, Session, Servo, Motor } from './models'
+import { MotorService } from './services'
 import {
   LoginAction,
   LogoutAction,
@@ -11,13 +11,13 @@ import {
   JsonResult,
   IsAuthenticated,
 } from '@furystack/http-api'
+import { InMemoryStore } from '@furystack/core'
+import { Injector } from '@furystack/inject'
+import { GoogleLoginAction } from '@furystack/auth-google'
+import { VerboseConsoleLogger } from '@furystack/logging'
 import '@furystack/typeorm-store'
 import { EdmType } from '@furystack/odata'
 import { DataSetSettings } from '@furystack/repository'
-import { routing } from './routing'
-import { seed } from './seed'
-import { User, Session, Servo, Motor } from './models'
-import { MotorService } from './services'
 
 export const authorizedOnly = async (options: { injector: Injector }) => {
   const authorized = await options.injector.getInstance(HttpUserContext).isAuthenticated()

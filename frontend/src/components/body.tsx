@@ -1,7 +1,7 @@
-import { createComponent, Shade, Router } from '@furystack/shades'
 import { SessionService, sessionState } from '../services/session'
 import { User } from '../odata/entity-types'
 import { Init, FirstPersonView, Offline, Login } from '../pages'
+import { createComponent, Shade, Router } from '@furystack/shades'
 
 export const Body = Shade({
   shadowDomName: 'shade-app-body',

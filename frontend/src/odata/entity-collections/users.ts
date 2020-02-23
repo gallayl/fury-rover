@@ -1,6 +1,6 @@
 import '@furystack/odata-fetchr'
-import { Injectable, Injector } from '@furystack/inject'
 import { User } from '../entity-types/user'
+import { Injectable, Injector } from '@furystack/inject'
 
 /**
  * Service class for collection users

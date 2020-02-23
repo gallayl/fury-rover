@@ -1,8 +1,8 @@
+import { User, Servo, Motor } from './models'
 import { PhysicalStore, StoreManager, SearchOptions } from '@furystack/core'
 import { HttpAuthenticationSettings } from '@furystack/http-api'
 import { Injector } from '@furystack/inject'
 import { TypeOrmStore } from '@furystack/typeorm-store'
-import { User, Servo, Motor } from './models'
 
 /**
  * gets an existing instance if exists or create and return if not. Throws error on multiple result

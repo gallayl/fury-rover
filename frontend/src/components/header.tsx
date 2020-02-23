@@ -1,5 +1,5 @@
-import { createComponent, RouteLink, Shade } from '@furystack/shades'
 import { AppBar } from './common'
+import { createComponent, RouteLink, Shade } from '@furystack/shades'
 
 export interface HeaderProps {
   title: string

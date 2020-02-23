@@ -10,12 +10,12 @@
     "build": "tsc -b"
   },
   "devDependencies": {
-    "@types/node": "^13.1.4",
+    "@types/node": "^13.7.4",
     "@types/wake_on_lan": "^0.0.27"
   },
   "dependencies": {
-    "@furystack/auth-google": "^3.0.14",
-    "@furystack/core": "^6.0.1",
+    "@furystack/auth-google": "^4.0.8",
+    "@furystack/core": "^7.0.7",
     "@furystack/http-api": "^5.2.1",
     "@furystack/inject": "^4.0.2",
     "@furystack/logging": "^2.0.3",

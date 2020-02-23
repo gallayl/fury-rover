@@ -1,13 +1,12 @@
 /** ToDo: Main entry point */
+import { Layout } from './components/layout'
+import { Motors, Servos } from './odata/entity-collections'
 import { PathHelper } from '@furystack/utils'
 import { Injector } from '@furystack/inject'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { VerboseConsoleLogger } from '@furystack/logging'
-import { Layout } from './components/layout'
 import '@furystack/odata-fetchr'
 import './services/google-auth-provider'
-
-import { Motors, Servos } from './odata/entity-collections'
 
 const shadeInjector = new Injector()
 
@@ -19,7 +18,7 @@ export const environmentOptions = {
   serviceUrl: (process.env.SERVICE_URL as string) || `${window.location.protocol}//${window.location.hostname}:9090`,
 }
 
-shadeInjector.useOdata({
+shadeInjector.useOdataClient({
   serviceEndpoint: PathHelper.joinPaths(environmentOptions.serviceUrl, 'odata'),
   defaultInit: {
     credentials: 'include',

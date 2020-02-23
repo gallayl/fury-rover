@@ -1,6 +1,6 @@
 import { parse } from 'url'
-import { RouteModel } from '@furystack/http-api'
 import { GetSystemDetailsAction, GetSystemLoadAction, WakeOnLanAction } from './actions'
+import { RouteModel } from '@furystack/http-api'
 
 export const routing: RouteModel = injector => {
   // Moved stuff to OData

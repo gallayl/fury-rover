@@ -1,8 +1,8 @@
+import { NippleComponent } from '../components/nipple'
+import { Motors, Servos } from '../odata/entity-collections'
 import { Shade, createComponent } from '@furystack/shades'
 import { JoystickOutputData } from 'nipplejs'
 import Semaphore from 'semaphore-async-await'
-import { NippleComponent } from '../components/nipple'
-import { Motors, Servos } from '../odata/entity-collections'
 
 export interface FirstPersonViewState {
   data?: JoystickOutputData
@@ -10,7 +10,7 @@ export interface FirstPersonViewState {
   sensitivity: number
 }
 
-const VECTOR_MULTIPLIER = 0.1
+const VECTOR_MULTIPLIER = 0.3
 const UPDATE_TIMEOUT = 50
 
 const updateLock = new Semaphore(1)

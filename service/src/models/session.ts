@@ -1,4 +1,4 @@
-import { DefaultSession } from '@furystack/http-api/dist/Models/DefaultSession'
+import { DefaultSession } from '@furystack/http-api/dist/models/default-session'
 import { Entity, Column, PrimaryColumn } from 'typeorm'
 
 @Entity()

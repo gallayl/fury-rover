@@ -1,6 +1,6 @@
 import '@furystack/odata-fetchr'
-import { Injectable, Injector } from '@furystack/inject'
 import { Motor } from '../entity-types/motor'
+import { Injectable, Injector } from '@furystack/inject'
 
 /**
  * Service class for collection motors

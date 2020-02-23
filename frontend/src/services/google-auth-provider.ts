@@ -1,8 +1,8 @@
-import { Retrier } from '@furystack/utils'
-import { Injector } from '@furystack/inject/dist/Injector'
-import { Injectable } from '@furystack/inject'
 import { Users } from '../odata/entity-collections'
 import { SessionService } from './session'
+import { Retrier } from '@furystack/utils'
+import { Injector } from '@furystack/inject/dist/injector'
+import { Injectable } from '@furystack/inject'
 
 /**
  * Options for Google OAuth Authentication
@@ -214,7 +214,7 @@ export class GoogleOauthProvider {
   ) {}
 }
 
-declare module '@furystack/inject/dist/Injector' {
+declare module '@furystack/inject/dist/injector' {
   interface Injector {
     useGoogleAuth(options: Partial<GoogleAuthenticationOptions> & { clientId: string }): Injector
   }
