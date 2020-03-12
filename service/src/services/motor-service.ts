@@ -80,7 +80,7 @@ export class MotorService {
 
   constructor(injector: Injector) {
     this.logger = injector.logger.withScope('@furystack-quad/PythonMotorService')
-    const path = join(process.cwd(), 'MotorService.py')
+    const path = join(__filename, '..', '..', '..', 'MotorService.py')
     this.logger.verbose({
       message: `Spawning Python process with file ${path}`,
     })
