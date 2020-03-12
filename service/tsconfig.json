@@ -8,5 +8,6 @@
     "skipLibCheck": true,
     "types": ["../types/aedes-persistence"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [{ "path": "../common" }]
 }

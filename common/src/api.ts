@@ -1,7 +1,7 @@
 import { RestApi, RequestAction } from '@furystack/rest'
 import { Systeminformation } from 'systeminformation'
-import { Motor } from './models'
-import { User as FUser } from '@furystack/core'
+import { Motor, LogEntry } from './models'
+import { User as FUser, SearchOptions } from '@furystack/core'
 
 export interface FuryRoverApi extends RestApi {
   GET: {
@@ -28,6 +28,7 @@ export interface FuryRoverApi extends RestApi {
         fsSize: Systeminformation.FsSizeData[]
       }
     }>
+    '/systemLog': RequestAction<{ result: LogEntry[]; body: SearchOptions<LogEntry, any> }>
     '/motors': RequestAction<{ result: Motor[] }>
   }
   POST: {
@@ -36,7 +37,9 @@ export interface FuryRoverApi extends RestApi {
     '/logout': RequestAction<{}>
     '/googleLogin': RequestAction<{ body: { token: string }; result: FUser }>
     '/motors/stopAll': RequestAction<{}>
-    '/motors/set4': RequestAction<{ body: [number, number, number, number] }>
+    '/move': RequestAction<{
+      body: { steer: number; frontLeft: number; backLeft: number; frontRight: number; backRight: number }
+    }>
     '/servos/setValues': RequestAction<{ body: Array<{ id: number; value: number }> }>
   }
 }

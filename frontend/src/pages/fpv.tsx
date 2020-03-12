@@ -11,7 +11,7 @@ export interface FirstPersonViewState {
 }
 
 const VECTOR_MULTIPLIER = 0.3
-const UPDATE_TIMEOUT = 50
+const UPDATE_TIMEOUT = 100
 
 const updateLock = new Semaphore(1)
 
@@ -23,20 +23,27 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
   constructed: ({ getState, updateState, injector }) => {
     const interval = setInterval(async () => {
       const currentState = getState()
-      if (currentState.lastSentData !== currentState.data) {
+      if (
+        !currentState.lastSentData ||
+        (currentState.data &&
+          JSON.stringify(currentState.lastSentData.vector) !== JSON.stringify(currentState.data.vector))
+      ) {
         if (currentState.data && updateLock.getPermits()) {
           try {
             await updateLock.acquire()
-            const mul = VECTOR_MULTIPLIER * currentState.data.force
-            const vectorX = currentState.data.vector && currentState.data.vector.x
-            const vectorY = currentState.data.vector && currentState.data.vector.y
-            const leftThrottle = mul * vectorY - mul * vectorX || 0
-            const rightThrottle = mul * vectorY + mul * vectorX || 0
+            const throttle = currentState.data.vector.y * VECTOR_MULTIPLIER * currentState.data.force
+            const steer = 90 + 90 * Math.cos(currentState.data.angle.radian)
             updateState({ lastSentData: currentState.data }, true)
-            await injector.getInstance(RestClient).call({
+            injector.getInstance(RestClient).call({
               method: 'POST',
-              action: '/motors/set4',
-              body: [leftThrottle, leftThrottle, rightThrottle, rightThrottle],
+              action: '/move',
+              body: {
+                frontLeft: throttle,
+                backLeft: throttle,
+                frontRight: throttle,
+                backRight: throttle,
+                steer,
+              },
             })
           } finally {
             updateLock.release()
@@ -92,8 +99,10 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
               border: '1px solid green',
             }}>
             <NippleComponent
-              style={{ flexGrow: '1' }}
-              managerOptions={{}}
+              style={{ flexGrow: '1', height: '100%', width: '100%', position: 'relative' }}
+              managerOptions={{
+                size: 500,
+              }}
               onMove={(_e, data) => {
                 updateState({ data }, true)
               }}

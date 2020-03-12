@@ -3,9 +3,10 @@ import { HttpUserContext } from '@furystack/rest-service'
 import { DataSetSettings } from '@furystack/repository'
 import { VerboseConsoleLogger } from '@furystack/logging'
 import { FileStore, InMemoryStore } from '@furystack/core'
-import { User, Session, Motor, Servo } from 'common'
+import { LogEntry, User, Session, Motor, Servo } from 'common'
 import { join } from 'path'
 import { MotorService } from './services'
+import { FileStoreLogger } from './services/file-store-logger'
 
 export const storeFiles = {
   users: join(__filename, '..', '..', 'stores', 'users.json'),
@@ -34,22 +35,29 @@ injector.useLogging(VerboseConsoleLogger)
 injector
   .setupStores(stores =>
     stores
+      .addStore(new InMemoryStore({ model: Session, primaryKey: 'sessionId' }))
+      .addStore(
+        new InMemoryStore({
+          model: LogEntry,
+          primaryKey: 'date',
+        }),
+      )
       .addStore(
         new FileStore({
           model: User,
           primaryKey: 'username',
           logger: injector.logger,
           fileName: storeFiles.users,
+          tickMs: 60 * 1000,
         }),
       )
-      .addStore(new InMemoryStore({ model: Session, primaryKey: 'sessionId' }))
       .addStore(
         new FileStore({
           model: Motor,
           primaryKey: 'id',
           fileName: storeFiles.motors,
           logger: injector.logger,
-          tickMs: Number.MAX_SAFE_INTEGER,
+          tickMs: 60 * 1000,
         }),
       )
       .addStore(
@@ -62,12 +70,14 @@ injector
         }),
       ),
   )
+  .useLogging(FileStoreLogger)
   .useHttpAuthentication({
     getUserStore: sm => sm.getStoreFor(User),
     getSessionStore: sm => sm.getStoreFor(Session),
   })
   .setupRepository(repo =>
     repo
+      .createDataSet(LogEntry, { ...authorizedDataSet, name: 'logEntries' })
       .createDataSet(User, {
         ...authorizedDataSet,
         name: 'users',
