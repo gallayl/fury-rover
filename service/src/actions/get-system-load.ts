@@ -1,11 +1,19 @@
 import { freemem, totalmem, uptime } from 'os'
-import { cpuTemperature, currentLoad } from 'systeminformation'
-import { RequestAction, JsonResult } from '@furystack/http-api'
+import { cpuTemperature, currentLoad, Systeminformation } from 'systeminformation'
+import { RequestAction, JsonResult } from '@furystack/rest'
 
-export const GetSystemLoadAction: RequestAction = async () => {
+export const GetSystemLoadAction: RequestAction<{
+  result: {
+    freemem: number
+    totalmem: number
+    uptime: number
+    currentLoad: Systeminformation.CurrentLoadData
+    cpuTemperature: Systeminformation.CpuTemperatureData
+  }
+}> = async () => {
   const [cpuTemperatureValue, currentLoadValue] = await Promise.all([
-    new Promise(resolve => cpuTemperature(resolve)),
-    new Promise(resolve => currentLoad(resolve)),
+    new Promise<Systeminformation.CpuTemperatureData>(resolve => cpuTemperature(resolve)),
+    new Promise<Systeminformation.CurrentLoadData>(resolve => currentLoad(resolve)),
   ])
 
   const responseBody = {

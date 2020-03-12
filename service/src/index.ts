@@ -1,23 +1,17 @@
 import { join } from 'path'
-import { routing } from './routing'
 import { seed } from './seed'
-import { User, Session, Servo, Motor } from './models'
+import '@furystack/rest-service'
+import { User, Session, Servo, Motor, FuryRoverApi } from 'common'
 import { MotorService } from './services'
-import {
-  LoginAction,
-  LogoutAction,
-  GetCurrentUser,
-  HttpUserContext,
-  JsonResult,
-  IsAuthenticated,
-} from '@furystack/http-api'
-import { InMemoryStore } from '@furystack/core'
+import { LoginAction, LogoutAction, HttpUserContext, GetCurrentUser, IsAuthenticated } from '@furystack/rest-service'
+import { JsonResult } from '@furystack/rest'
+import { InMemoryStore, FileStore } from '@furystack/core'
 import { Injector } from '@furystack/inject'
 import { GoogleLoginAction } from '@furystack/auth-google'
 import { VerboseConsoleLogger } from '@furystack/logging'
-import '@furystack/typeorm-store'
-import { EdmType } from '@furystack/odata'
+import '@furystack/core'
 import { DataSetSettings } from '@furystack/repository'
+import { GetSystemLoadAction, GetSystemDetailsAction, WakeOnLanAction } from './actions'
 
 export const authorizedOnly = async (options: { injector: Injector }) => {
   const authorized = await options.injector.getInstance(HttpUserContext).isAuthenticated()
@@ -35,46 +29,24 @@ export const authorizedDataSet: Partial<DataSetSettings<any>> = {
   authroizeRemoveEntity: authorizedOnly,
 }
 
-export const i = new Injector()
-  .useLogging(VerboseConsoleLogger)
-  .useTypeOrm({
-    type: 'sqlite',
-    database: join(process.cwd(), 'users.sqlite'),
-    entities: [User],
-    logging: false,
-    synchronize: true,
-    name: 'users',
-  })
-  .useTypeOrm({
-    type: 'sqlite',
-    database: join(process.cwd(), 'sessions.sqlite'),
-    entities: [Session],
-    logging: false,
-    synchronize: true,
-    name: 'session',
-  })
-  .setupStores(stores =>
-    stores
-      .useTypeOrmStore(User, 'users')
-      .useTypeOrmStore(Session, 'session')
-      .addStore(new InMemoryStore({ model: Motor, primaryKey: 'id' }))
-      .addStore(new InMemoryStore({ model: Servo, primaryKey: 'channel' })),
-  )
-  .useHttpApi({
-    corsOptions: {
-      credentials: true,
-      origins: ['http://localhost:8080', 'http://192.168.0.150'],
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH' as any],
-    },
-  })
+export const i = new Injector().useLogging(VerboseConsoleLogger)
+i.setupStores(stores =>
+  stores
+    .addStore(
+      new FileStore({
+        model: User,
+        primaryKey: 'username',
+        logger: i.logger,
+        fileName: join(__filename, '..', '..', 'users.json'),
+      }),
+    )
+    .addStore(new InMemoryStore({ model: Session, primaryKey: 'sessionId' }))
+    .addStore(new InMemoryStore({ model: Motor, primaryKey: 'id' }))
+    .addStore(new InMemoryStore({ model: Servo, primaryKey: 'channel' })),
+)
   .useHttpAuthentication({
     getUserStore: sm => sm.getStoreFor(User),
     getSessionStore: sm => sm.getStoreFor(Session),
-  })
-  .useDefaultLoginRoutes()
-  .addHttpRouting(routing)
-  .listenHttp({
-    port: parseInt(process.env.APP_SERVICE_PORT as string, 10) || 9090,
   })
   .setupRepository(repo =>
     repo
@@ -103,200 +75,48 @@ export const i = new Injector()
         },
       }),
   )
-  .useOdata('odata', odata =>
-    odata.addNameSpace('default', ns => {
-      ns.setupEntities(entities =>
-        entities
-          .addEntityType({
-            model: User,
-            primaryKey: 'username',
-            properties: [{ property: 'username', type: EdmType.String }],
-            name: 'User',
-          })
-          .addEntityType({
-            model: Servo,
-            name: 'Servo',
-            primaryKey: 'channel',
-            properties: [
-              {
-                property: 'currentValue',
-                type: EdmType.Int16,
-              },
-            ],
-          })
-          .addEntityType({
-            model: Motor,
-            name: 'Motor',
-            primaryKey: 'id',
-            properties: [
-              {
-                property: 'id',
-                type: EdmType.Int16,
-              },
-              { property: 'isReversed', type: EdmType.Boolean },
-              { property: 'multiplier', type: EdmType.Int16 },
-              { property: 'value', type: EdmType.Int16 },
-            ],
-            functions: [
-              {
-                name: 'getValue',
-                isBound: true,
-                action: async injector => {
-                  const entity = await injector.getOdataContext<Motor>().getCurrentEntity()
-                  return JsonResult({ value: entity ? entity.value : 0 })
-                },
-              },
-            ],
-            actions: [
-              {
-                action: async injector => {
-                  const ctx = injector.getOdataContext<Motor>()
-                  const entity = await ctx.getCurrentEntity()
-                  if (entity) {
-                    await injector.getDataSetFor<Motor>('motors').update(injector, entity.id, {
-                      ...entity,
-                      value: 0,
-                    })
-
-                    return JsonResult({ result: 'ok' })
-                  }
-                  return JsonResult(
-                    {
-                      error: 'failed to update',
-                    },
-                    404,
-                  )
-                },
-                name: 'stop',
-                isBound: true,
-                parameters: [],
-                returnType: EdmType.Unknown,
-              },
-            ],
-          }),
-      ).setupCollections(collections =>
-        collections
-          .addCollection({
-            model: User,
-            name: 'users',
-            functions: [
-              {
-                action: GetCurrentUser,
-                name: 'current',
-              },
-              {
-                action: IsAuthenticated,
-                name: 'isAuthenticated',
-                returnType: Object,
-              },
-            ],
-            actions: [
-              {
-                action: LoginAction,
-                name: 'login',
-                parameters: [
-                  { name: 'username', type: EdmType.String, nullable: false },
-                  { name: 'password', type: EdmType.String, nullable: false },
-                ],
-                returnType: User,
-              },
-              {
-                action: GoogleLoginAction,
-                name: 'googleLogin',
-                parameters: [
-                  {
-                    name: 'token',
-                    type: EdmType.String,
-                    nullable: false,
-                  },
-                ],
-              },
-              { action: LogoutAction, name: 'logout' },
-            ],
-          })
-          .addCollection({
-            model: Motor,
-            name: 'motors',
-            actions: [
-              {
-                name: 'stopAll',
-                // parameters: [],
-                isBound: true,
-                returnType: EdmType.Unknown,
-                action: async injector => {
-                  injector.getInstance(MotorService).stopAll()
-                  const dataSet = injector.getOdataContext<Motor>().getCurrentDataSet()
-                  const motors = await dataSet.filter(injector, {})
-                  motors.map(motor => dataSet.update(injector, motor.id, { ...motor, value: 0 }))
-                  return JsonResult({ result: 'ok' })
-                },
-              },
-              {
-                name: 'set4',
-                returnType: EdmType.Unknown,
-                isBound: true,
-                action: async injector => {
-                  const body = await injector.getRequest().readPostBody<{
-                    values: [number, number, number, number]
-                  }>()
-                  injector.getInstance(MotorService).set4(body.values)
-                  return JsonResult({ result: 'ok' })
-                },
-              },
-            ],
-            functions: [
-              {
-                name: 'getAllValue',
-                parameters: [],
-                isBound: true,
-                returnType: EdmType.Unknown,
-                action: async injector => {
-                  const dataSet = injector.getOdataContext<Motor>().getCurrentDataSet()
-                  const motors = await dataSet.filter(injector, {})
-                  return JsonResult({
-                    result: 'ok',
-                    values: motors.map(m => ({ id: m.id, value: m.value })),
-                  })
-                },
-              },
-            ],
-          })
-          .addCollection({
-            model: Servo,
-            name: 'servos',
-            actions: [
-              {
-                name: 'setValues',
-                isBound: true,
-                returnType: EdmType.Unknown,
-                action: async injector => {
-                  const body = await injector.getRequest().readPostBody<{
-                    values: Array<{ id: number; value: number }>
-                  }>()
-                  injector.getInstance(MotorService).setServos(body.values)
-                  return JsonResult({ ok: true })
-                },
-              },
-            ],
-          }),
-      )
-
-      ns.setupGlobalActions([
-        {
-          action: LoginAction,
-          name: 'login',
-          parameters: [
-            { name: 'username', type: EdmType.String, nullable: false },
-            { name: 'password', type: EdmType.String, nullable: false },
-          ],
-        },
-        { action: LogoutAction, name: 'logout' },
-      ])
-
-      return ns
-    }),
-  )
-  .disposeOnProcessExit()
+i.useRestService<FuryRoverApi>({
+  root: 'api',
+  api: {
+    GET: {
+      '/currentUser': GetCurrentUser,
+      '/isAuthenticated': IsAuthenticated,
+      '/systemLoad': GetSystemLoadAction,
+      '/systemDetails': GetSystemDetailsAction,
+      '/motors': async ({ injector }) => {
+        const motors: Motor[] = await injector.getDataSetFor(Motor).filter(injector, { top: 100 })
+        return JsonResult(motors)
+      },
+    },
+    POST: {
+      '/googleLogin': GoogleLoginAction,
+      '/login': LoginAction,
+      '/logout': LogoutAction,
+      '/wakeOnLan': WakeOnLanAction,
+      '/motors/set4': async ({ getBody, injector }) => {
+        const body = await getBody()
+        injector.getInstance(MotorService).set4(body)
+        return JsonResult({}, 200)
+      },
+      '/motors/stopAll': async ({ injector }) => {
+        injector.getInstance(MotorService).stopAll()
+        return JsonResult({}, 200)
+      },
+      '/servos/setValues': async ({ injector, getBody }) => {
+        const values = await getBody()
+        injector.getInstance(MotorService).setServos(values)
+        return JsonResult({}, 200)
+      },
+    },
+  },
+  port: parseInt(process.env.APP_SERVICE_PORT as string, 10) || 9090,
+  cors: {
+    credentials: true,
+    origins: ['http://localhost:8080', 'http://192.168.0.150'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH' as any],
+  },
+})
+i.disposeOnProcessExit()
 
 i.getInstance(MotorService)
 

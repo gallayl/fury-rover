@@ -1,7 +1,7 @@
-import { Users } from '../odata/entity-collections'
-import { User } from '../odata/entity-types'
 import { Injectable } from '@furystack/inject'
 import { ObservableValue, usingAsync, sleepAsync } from '@furystack/utils'
+import { User } from '@furystack/core'
+import { RestClient } from './rest-client'
 
 export type sessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
 
@@ -21,10 +21,10 @@ export class SessionService {
   private async init() {
     await usingAsync(this.operation(), async () => {
       try {
-        const { isAuthenticated } = await this.users.isAuthenticated()
+        const { isAuthenticated } = await this.api.call({ method: 'GET', action: '/isAuthenticated' })
         this.state.setValue(isAuthenticated ? 'authenticated' : 'unauthenticated')
         if (isAuthenticated) {
-          const usr = await this.users.current()
+          const usr = await this.api.call({ method: 'GET', action: '/currentUser' })
           this.currentUser.setValue(usr)
         }
       } catch (error) {
@@ -37,7 +37,7 @@ export class SessionService {
     await usingAsync(this.operation(), async () => {
       try {
         await sleepAsync(2000)
-        const usr = await this.users.login({ username, password })
+        const usr = await this.api.call({ method: 'POST', action: '/login', body: { username, password } })
         this.currentUser.setValue(usr)
         this.state.setValue('authenticated')
       } catch (error) {
@@ -48,13 +48,13 @@ export class SessionService {
 
   public async logout() {
     await usingAsync(this.operation(), async () => {
-      this.users.logout()
+      this.api.call({ method: 'POST', action: '/logout' })
       this.currentUser.setValue(null)
       this.state.setValue('unauthenticated')
     })
   }
 
-  constructor(private users: Users) {
+  constructor(private api: RestClient) {
     this.init()
   }
 }

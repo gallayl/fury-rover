@@ -1,12 +1,10 @@
 /** ToDo: Main entry point */
 import { Layout } from './components/layout'
-import { Motors, Servos } from './odata/entity-collections'
-import { PathHelper } from '@furystack/utils'
 import { Injector } from '@furystack/inject'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { VerboseConsoleLogger } from '@furystack/logging'
-import '@furystack/odata-fetchr'
 import './services/google-auth-provider'
+import { RestClient } from './services/rest-client'
 
 const shadeInjector = new Injector()
 
@@ -18,22 +16,22 @@ export const environmentOptions = {
   serviceUrl: (process.env.SERVICE_URL as string) || `${window.location.protocol}//${window.location.hostname}:9090`,
 }
 
-shadeInjector.useOdataClient({
-  serviceEndpoint: PathHelper.joinPaths(environmentOptions.serviceUrl, 'odata'),
-  defaultInit: {
-    credentials: 'include',
-    mode: 'no-cors',
-  },
+const rest = shadeInjector.getInstance(RestClient)
+rest
+  .call({
+    method: 'POST',
+    action: '/motors/stopAll',
+  })
+  .then(resp => console.log('Motors stopped', resp))
+
+rest.call({
+  method: 'POST',
+  action: '/servos/setValues',
+  body: [
+    { id: 0, value: 45 },
+    { id: 1, value: 0 },
+  ],
 })
-
-const motors = shadeInjector.getInstance(Motors)
-const servos = shadeInjector.getInstance(Servos)
-
-motors.stopAll().then(resp => console.log('Motors stopped', resp))
-servos.setValues([
-  { id: 0, value: 45 },
-  { id: 1, value: 0 },
-])
 
 shadeInjector.useLogging(VerboseConsoleLogger)
 

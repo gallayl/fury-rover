@@ -1,5 +1,5 @@
 import { NippleComponent } from '../components/nipple'
-import { Motors, Servos } from '../odata/entity-collections'
+import { RestClient } from '../services/rest-client'
 import { Shade, createComponent } from '@furystack/shades'
 import { JoystickOutputData } from 'nipplejs'
 import Semaphore from 'semaphore-async-await'
@@ -33,7 +33,11 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
             const leftThrottle = mul * vectorY - mul * vectorX || 0
             const rightThrottle = mul * vectorY + mul * vectorX || 0
             updateState({ lastSentData: currentState.data }, true)
-            await injector.getInstance(Motors).set4([leftThrottle, leftThrottle, rightThrottle, rightThrottle])
+            await injector.getInstance(RestClient).call({
+              method: 'POST',
+              action: '/motors/set4',
+              body: [leftThrottle, leftThrottle, rightThrottle, rightThrottle],
+            })
           } finally {
             updateLock.release()
           }
@@ -72,7 +76,11 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
               onchange={ev => {
                 const { value } = ev.currentTarget as HTMLInputElement
                 if (value && !isNaN(value as any))
-                  injector.getInstance(Servos).setValues([{ id: 0, value: parseInt(value, 10) }])
+                  injector.getInstance(RestClient).call({
+                    method: 'POST',
+                    action: '/servos/setValues',
+                    body: [{ id: 0, value: parseInt(value, 10) }],
+                  })
               }}
             />
           </div>
@@ -90,7 +98,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                 updateState({ data }, true)
               }}
               onEnd={() => {
-                injector.getInstance(Motors).stopAll()
+                injector.getInstance(RestClient).call({ method: 'POST', action: '/motors/stopAll' })
                 const newData = { ...getState().data, vector: { x: 0, y: 0 } }
                 updateState({ data: newData }, true)
               }}>
@@ -135,7 +143,11 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                 onchange={ev => {
                   const { value } = ev.currentTarget as HTMLInputElement
                   if (value && !isNaN(value as any))
-                    injector.getInstance(Servos).setValues([{ id: 1, value: parseInt(value, 10) }])
+                    injector.getInstance(RestClient).call({
+                      method: 'POST',
+                      action: '/servos/setValues',
+                      body: [{ id: 1, value: parseInt(value, 10) }],
+                    })
                 }}
               />
             </div>

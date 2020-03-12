@@ -1,12 +1,14 @@
-import { RequestAction, JsonResult } from '@furystack/http-api'
+import { RequestAction, JsonResult, RequestError } from '@furystack/rest'
 import { wake } from 'wake_on_lan'
 
-export const WakeOnLanAction: RequestAction = async injector => {
-  const postBody = await injector.getRequest().readPostBody<{ mac: string }>()
+export const WakeOnLanAction: RequestAction<{ result: { success: boolean }; body: { mac: string } }> = async ({
+  getBody,
+}) => {
+  const { mac } = await getBody()
   return await new Promise((resolve, _reject) => {
-    wake(postBody.mac, err => {
+    wake(mac, err => {
       if (err) {
-        resolve(JsonResult({ error: err }, 500))
+        throw new RequestError('Failed to wake on lan', 500)
       } else {
         resolve(JsonResult({ success: true }))
       }

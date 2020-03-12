@@ -6,7 +6,6 @@
   "scripts": {
     "build": "rimraf bundle && rimraf dist && webpack --config webpack.config.js --mode=production",
     "start": "webpack-dev-server --mode=development",
-    "update-metadata": "yarn odata-fetchr",
     "clean": "rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,9 +27,10 @@
     "webpack-dev-server": "^3.4.1"
   },
   "dependencies": {
-    "@furystack/odata-fetchr": "^1.0.6",
-    "@furystack/shades": "^2.3.9",
     "@furystack/logging": "^2.0.18",
+    "@furystack/rest-client-fetch": "^1.0.1",
+    "@furystack/shades": "^2.3.9",
+    "common": "1.0.0",
     "nipplejs": "^0.8.3",
     "semaphore-async-await": "^1.5.1"
   }
