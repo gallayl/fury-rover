@@ -10,6 +10,13 @@
       "name": "Service",
       "program": "${workspaceFolder}/service/src/index.ts",
       "outFiles": ["${workspaceFolder}/service/dist/index.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Seed",
+      "program": "${workspaceFolder}/service/src/seed.ts",
+      "outFiles": ["${workspaceFolder}/service/dist/seed.js"]
     }
   ]
 }

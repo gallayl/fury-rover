@@ -1,7 +1,10 @@
 import { User, Servo, Motor } from 'common'
 import { PhysicalStore, StoreManager, SearchOptions } from '@furystack/core'
+import '@furystack/repository'
 import { HttpAuthenticationSettings } from '@furystack/rest-service'
 import { Injector } from '@furystack/inject'
+import { injector as mainInjector, storeFiles } from './config'
+import { existsSync, writeFileSync } from 'fs'
 
 /**
  * gets an existing instance if exists or create and return if not. Throws error on multiple result
@@ -40,8 +43,16 @@ export const seed = async (injector: Injector) => {
   logger.verbose({ message: 'Seeding data...' })
   const sm = injector.getInstance(StoreManager)
   const userStore = sm.getStoreFor(User)
+
+  Object.entries(storeFiles).map(([name, file]) => {
+    if (!existsSync(file)) {
+      logger.verbose({ message: `DB file for '${name}' does not exists, creating... `, data: { file } })
+      writeFileSync(file, '[]')
+    }
+  })
+
   await getOrCreate(
-    { filter: { username: 'testuser' } },
+    { filter: { username: { $eq: 'testuser' } } },
     {
       username: 'testuser',
       password: injector.getInstance(HttpAuthenticationSettings).hashMethod('password'),
@@ -51,28 +62,32 @@ export const seed = async (injector: Injector) => {
     injector,
   )
 
-  await getOrCreate(
-    { filter: { username: 'gallay.lajos@gmail.com' } },
-    {
-      username: 'gallay.lajos@gmail.com',
-      roles: ['demigod'],
-      password: '',
-    } as User,
-    userStore,
-    injector,
-  )
-
   const servoStore = sm.getStoreFor(Servo)
   const defaultServoValue = 90
 
   for (let i = 0; i < 4; i++) {
-    await getOrCreate({ filter: { channel: i } }, { channel: i, currentValue: defaultServoValue }, servoStore, injector)
+    await getOrCreate(
+      { filter: { channel: { $eq: i } } },
+      { channel: i, currentValue: defaultServoValue },
+      servoStore,
+      injector,
+    )
   }
 
   const motorStore = sm.getStoreFor(Motor)
   for (let i = 1; i <= 4; i++) {
-    await getOrCreate({ filter: { id: i } }, { id: i, value: 0 }, motorStore, injector)
+    await getOrCreate({ filter: { id: { $eq: i } } }, { id: i, value: 0 }, motorStore, injector)
   }
 
   logger.verbose({ message: 'Seeding data completed.' })
 }
+
+seed(mainInjector)
+  .then(async () => {
+    await mainInjector.dispose()
+    process.exit(0)
+  })
+  .catch(err => {
+    console.error(err)
+    process.exit(1)
+  })
