@@ -64,12 +64,7 @@ export class MotorService {
   }
 
   public set4(values: [number, number, number, number]) {
-    this.writeToPy(
-      `set4 ${values
-        .map(v => Math.min(v, 1))
-        .map(v => Math.max(-1, v))
-        .join(' ')}`,
-    )
+    this.writeToPy(`set4 ${values.join(' ')}`)
   }
 
   public setServos(servoValues: Array<{ id: number; value: number }>) {
