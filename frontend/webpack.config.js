@@ -1,8 +1,7 @@
 var path = require('path')
 const webpack = require('webpack')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const TsConfigWebpackPlugin = require('ts-config-webpack-plugin')
 
 module.exports = {
   mode: 'development',
@@ -42,8 +41,7 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.json'],
   },
   plugins: [
-    new BundleAnalyzerPlugin({ analyzerPort: 8745 }),
-    new TsConfigWebpackPlugin(),
+    // new BundleAnalyzerPlugin({ analyzerPort: 8745 }),
     new HtmlWebpackPlugin({
       template: './index.html',
     }),
@@ -52,8 +50,9 @@ module.exports = {
       DEBUG: true,
       APP_VERSION: require('./package.json').version,
       BUILD_DATE: new Date().toISOString(),
-      SERVICE_URL: 'http://localhost:9090',
+      SERVICE_URL: process.env.FURY_ROVER_SERVICE || 'http://localhost:9090',
     }),
+    new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
   ],
   module: {
     rules: [
@@ -61,12 +60,7 @@ module.exports = {
       // { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
 
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      {
-        enforce: 'pre',
-        test: /\.js$/,
-        loader: 'source-map-loader',
-        exclude: /monaco-editor/,
-      },
+      { test: /\.tsx?$/, loader: 'ts-loader' },
       {
         test: /\.css$/,
         use: [

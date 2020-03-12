@@ -65,3 +65,5 @@ dist
 frontend/bundle
 
 *.sqlite
+
+service/stores/*.json

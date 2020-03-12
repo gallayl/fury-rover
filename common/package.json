@@ -1,0 +1,17 @@
+{
+  "name": "common",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "GPL-2.0-only",
+  "private": true,
+  "scripts": {},
+  "devDependencies": {
+    "@types/node": "^13.7.4",
+    "@types/wake_on_lan": "^0.0.27",
+    "systeminformation": "^4.23.0"
+  },
+  "dependencies": {
+    "@furystack/rest": "^1.1.1",
+    "tslib": "^1.10.0"
+  }
+}

@@ -9,6 +9,7 @@
   "private": true,
   "workspaces": {
     "packages": [
+      "common",
       "frontend",
       "service"
     ],
@@ -24,7 +25,7 @@
     "eslint": "^6.0.1",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-cypress": "^2.2.1",
-    "eslint-plugin-jsdoc": "^21.0.0",
+    "eslint-plugin-jsdoc": "^22.0.0",
     "eslint-plugin-prettier": "^3.1.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.7",
@@ -51,6 +52,7 @@
   "scripts": {
     "build": "tsc -b && yarn workspace frontend build",
     "start": "concurrently --kill-others \"yarn startService\" \"yarn startFrontend\"  ",
+    "seed": "yarn workspace service seed",
     "startService": "yarn workspace service start",
     "startFrontend": "yarn workspace frontend start",
     "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo",

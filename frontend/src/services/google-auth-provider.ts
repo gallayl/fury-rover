@@ -1,8 +1,8 @@
-import { Users } from '../odata/entity-collections'
 import { SessionService } from './session'
 import { Retrier } from '@furystack/utils'
 import { Injector } from '@furystack/inject/dist/injector'
 import { Injectable } from '@furystack/inject'
+import { RestClient } from './rest-client'
 
 /**
  * Options for Google OAuth Authentication
@@ -66,7 +66,7 @@ export class GoogleOauthProvider {
     try {
       this.session.isOperationInProgress.setValue(true)
       const token = await this.getToken()
-      const user = await this.usersService.googleLogin({ token })
+      const user = await this.restApiClient.call({ method: 'POST', action: '/googleLogin', body: { token } })
       if (user) {
         this.session.currentUser.setValue(user)
         this.session.state.setValue('authenticated')
@@ -209,7 +209,7 @@ export class GoogleOauthProvider {
    */
   constructor(
     private readonly options: GoogleAuthenticationOptions,
-    private readonly usersService: Users,
+    private readonly restApiClient: RestClient,
     private readonly session: SessionService,
   ) {}
 }
