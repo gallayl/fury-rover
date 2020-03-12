@@ -10,7 +10,7 @@ export interface FirstPersonViewState {
   sensitivity: number
 }
 
-const VECTOR_MULTIPLIER = 0.3
+const VECTOR_MULTIPLIER = 30
 const UPDATE_TIMEOUT = 100
 
 const updateLock = new Semaphore(1)
@@ -32,7 +32,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
           try {
             await updateLock.acquire()
             const throttle = currentState.data.vector.y * VECTOR_MULTIPLIER * currentState.data.force
-            const steer = Math.round(90 + 90 * Math.cos(currentState.data.angle.radian))
+            const steer = Math.round(90 + 30 * Math.cos(currentState.data.angle.radian))
             updateState({ lastSentData: currentState.data }, true)
             injector.getInstance(RestClient).call({
               method: 'POST',
