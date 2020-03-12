@@ -50,7 +50,7 @@ module.exports = {
       DEBUG: true,
       APP_VERSION: require('./package.json').version,
       BUILD_DATE: new Date().toISOString(),
-      SERVICE_URL: 'http://localhost:9090',
+      SERVICE_URL: process.env.FURY_ROVER_SERVICE || 'http://localhost:9090',
     }),
     new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
   ],
