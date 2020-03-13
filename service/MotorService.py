@@ -2,6 +2,7 @@ import sys
 import string
 from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
 import atexit
+import time
 
 mh = Raspi_MotorHAT(addr=0x6f, freq=50)
 
