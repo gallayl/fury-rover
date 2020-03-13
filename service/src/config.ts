@@ -12,6 +12,7 @@ export const storeFiles = {
   users: join(__filename, '..', '..', 'stores', 'users.json'),
   motors: join(__filename, '..', '..', 'stores', 'motors.json'),
   servos: join(__filename, '..', '..', 'stores', 'servos.json'),
+  sessions: join(__filename, '..', '..', 'stores', 'sessions.json'),
 }
 
 export const authorizedOnly = async (options: { injector: Injector }) => {
@@ -65,6 +66,15 @@ injector
           model: Servo,
           primaryKey: 'channel',
           fileName: storeFiles.servos,
+          logger: injector.logger,
+          tickMs: Number.MAX_SAFE_INTEGER,
+        }),
+      )
+      .addStore(
+        new FileStore({
+          model: Session,
+          primaryKey: 'sessionId',
+          fileName: storeFiles.sessions,
           logger: injector.logger,
           tickMs: Number.MAX_SAFE_INTEGER,
         }),
