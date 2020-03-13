@@ -107,7 +107,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                 updateState({ data }, true)
               }}
               onEnd={() => {
-                injector.getInstance(RestClient).call({ method: 'POST', action: '/motors/release' })
+                injector.getInstance(RestClient).call({ method: 'POST', action: '/release' })
                 const newData = { ...getState().data, vector: { x: 0, y: 0 } }
                 updateState({ data: newData }, true)
               }}>
