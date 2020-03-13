@@ -21,30 +21,37 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
     sensitivity: VECTOR_MULTIPLIER,
   },
   constructed: ({ getState, updateState, injector }) => {
-    const interval = setInterval(async () => {
+    const isUpdateNeeded = () => {
       const currentState = getState()
-      if (
-        !currentState.lastSentData ||
+      return !currentState.lastSentData ||
         (currentState.data &&
           JSON.stringify(currentState.lastSentData.vector) !== JSON.stringify(currentState.data.vector))
-      ) {
+        ? true
+        : false
+    }
+
+    const interval = setInterval(async () => {
+      const currentState = getState()
+      if (isUpdateNeeded()) {
         if (currentState.data && updateLock.getPermits()) {
           try {
             await updateLock.acquire()
-            const throttle = Math.round(currentState.data.vector.y * VECTOR_MULTIPLIER * currentState.data.force)
-            const steer = Math.round(90 + 30 * Math.cos(currentState.data.angle.radian))
-            updateState({ lastSentData: currentState.data }, true)
-            injector.getInstance(RestClient).call({
-              method: 'POST',
-              action: '/move',
-              body: {
-                frontLeft: throttle,
-                backLeft: throttle,
-                frontRight: throttle,
-                backRight: throttle,
-                steer,
-              },
-            })
+            if (isUpdateNeeded()) {
+              const throttle = Math.round(currentState.data.vector.y * VECTOR_MULTIPLIER * currentState.data.force)
+              const steer = Math.round(90 + 60 * Math.cos(currentState.data.angle.radian))
+              updateState({ lastSentData: currentState.data }, true)
+              await injector.getInstance(RestClient).call({
+                method: 'POST',
+                action: '/move',
+                body: {
+                  frontLeft: throttle,
+                  backLeft: throttle,
+                  frontRight: throttle,
+                  backRight: throttle,
+                  steer,
+                },
+              })
+            }
           } finally {
             updateLock.release()
           }
@@ -109,6 +116,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
               onEnd={() => {
                 injector.getInstance(RestClient).call({ method: 'POST', action: '/release' })
                 const newData = { ...getState().data, vector: { x: 0, y: 0 } }
+                updateState({ lastSentData: newData }, true)
                 updateState({ data: newData }, true)
               }}>
               <img

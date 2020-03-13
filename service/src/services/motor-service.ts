@@ -3,12 +3,15 @@ import { join } from 'path'
 import { Injectable, Injector } from '@furystack/inject'
 import { ScopedLogger } from '@furystack/logging'
 import { ObservableValue, Retrier } from '@furystack/utils'
+import Semaphore from 'semaphore-async-await'
 
 /**
  * Service class for Adafruit Motor HAT
  */
 @Injectable({ lifetime: 'singleton' })
 export class MotorService {
+  writeLock = new Semaphore(1)
+
   private readonly pyService: ChildProcessWithoutNullStreams
 
   public readonly msgFromPy: ObservableValue<string> = new ObservableValue('')
@@ -43,12 +46,17 @@ export class MotorService {
   }
 
   private async writeToPy(value: string) {
-    await Retrier.create(async () => this.pyService.stdin.writable).setup({
-      RetryIntervalMs: 1,
-      Retries: 5,
-      onFail: () => this.logger.warning({ message: 'Failed to write to stdin.' }),
-    })
-    this.pyService.stdin.write(`${value}\n`)
+    try {
+      await this.writeLock.acquire()
+      await Retrier.create(async () => this.pyService.stdin.writable).setup({
+        RetryIntervalMs: 1,
+        Retries: 5,
+        onFail: () => this.logger.warning({ message: 'Failed to write to stdin.' }),
+      })
+      this.pyService.stdin.write(`${value}\n`)
+    } finally {
+      this.writeLock.release()
+    }
   }
 
   public setMotorValue(motorId: number, motorValue: number) {
