@@ -6,7 +6,7 @@ import atexit
 mh = Raspi_MotorHAT(addr=0x6f, freq=50)
 
 servoMin = 120  # Min pulse length out of 4096
-servoMax = 670  # Max pulse length out of 4096
+servoMax = 545  # Max pulse length out of 4096
 
 
 def arduino_map(x, in_min, in_max, out_min, out_max):
