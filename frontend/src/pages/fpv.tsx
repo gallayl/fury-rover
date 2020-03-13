@@ -11,7 +11,7 @@ export interface FirstPersonViewState {
 }
 
 const VECTOR_MULTIPLIER = 30
-const UPDATE_TIMEOUT = 100
+const UPDATE_TIMEOUT = 150
 
 const updateLock = new Semaphore(1)
 
@@ -107,7 +107,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                 updateState({ data }, true)
               }}
               onEnd={() => {
-                injector.getInstance(RestClient).call({ method: 'POST', action: '/motors/stopAll' })
+                injector.getInstance(RestClient).call({ method: 'POST', action: '/motors/release' })
                 const newData = { ...getState().data, vector: { x: 0, y: 0 } }
                 updateState({ data: newData }, true)
               }}>

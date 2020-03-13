@@ -40,6 +40,7 @@ export interface FuryRoverApi extends RestApi {
     '/move': RequestAction<{
       body: { steer: number; frontLeft: number; backLeft: number; frontRight: number; backRight: number }
     }>
+    '/release': RequestAction<{}>
     '/servos/setValues': RequestAction<{ body: Array<{ id: number; value: number }> }>
   }
 }

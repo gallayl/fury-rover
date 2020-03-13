@@ -51,6 +51,15 @@ injector.useRestService<FuryRoverApi>({
         i.getInstance(MotorService).setServos(values)
         return JsonResult({}, 200)
       }),
+      '/release': Authenticate()(async ({ injector: i }) => {
+        const motorService = i.getInstance(MotorService)
+        motorService.setServos([
+          { id: 14, value: 90 },
+          { id: 15, value: 90 },
+        ])
+        motorService.stopAll()
+        return JsonResult({}, 200)
+      }),
     },
   },
   port: parseInt(process.env.APP_SERVICE_PORT as string, 10) || 9090,
