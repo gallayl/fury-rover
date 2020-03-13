@@ -38,7 +38,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
             await updateLock.acquire()
             if (isUpdateNeeded()) {
               const throttle = Math.round(currentState.data.vector.y * VECTOR_MULTIPLIER * currentState.data.force)
-              const steer = Math.round(90 + 60 * Math.cos(currentState.data.angle.radian))
+              const steer = Math.max(0, Math.min(180, Math.round(90 + 60 * Math.cos(currentState.data.angle.radian))))
               updateState({ lastSentData: currentState.data }, true)
               await injector.getInstance(RestClient).call({
                 method: 'POST',

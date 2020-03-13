@@ -5,8 +5,8 @@ import atexit
 
 mh = Raspi_MotorHAT(addr=0x6f, freq=50)
 
-servoMin = 120  # Min pulse length out of 4096
-servoMax = 545  # Max pulse length out of 4096
+servoMin = 150  # Min pulse length out of 4096
+servoMax = 510  # Max pulse length out of 4096
 
 
 def arduino_map(x, in_min, in_max, out_min, out_max):
@@ -37,6 +37,7 @@ def setMotor(channel, value):
     sys.stdout.write(str(value))
     sys.stdout.write("\r\n")
     sys.stdout.flush()
+    time.sleep(0.005)
 
 
 def setServo(channel, value):
@@ -53,6 +54,7 @@ def setServo(channel, value):
     sys.stdout.write(str(value))
     sys.stdout.write("\r\n")
     sys.stdout.flush()
+    time.sleep(0.005)
 
 
 atexit.register(turnOffMotors)
