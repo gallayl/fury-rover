@@ -36,7 +36,10 @@ injector.useRestService<FuryRoverApi>({
         const { frontLeft, backLeft, frontRight, backRight, steer } = await getBody()
         const service = i.getInstance(MotorService)
         service.set4([frontLeft, backLeft, frontRight, backRight])
-        service.setServos([{ id: 15, value: steer }])
+        service.setServos([
+          { id: 14, value: steer },
+          { id: 15, value: steer },
+        ])
         return JsonResult({}, 200)
       }),
       '/motors/stopAll': Authenticate()(async ({ injector: i }) => {
