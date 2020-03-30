@@ -6,7 +6,7 @@ export const WakeOnLanAction: RequestAction<{ result: { success: boolean }; body
 }) => {
   const { mac } = await getBody()
   return await new Promise((resolve, _reject) => {
-    wake(mac, err => {
+    wake(mac, (err) => {
       if (err) {
         throw new RequestError('Failed to wake on lan', 500)
       } else {

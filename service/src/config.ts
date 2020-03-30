@@ -34,7 +34,7 @@ export const authorizedDataSet: Partial<DataSetSettings<any>> = {
 export const injector = new Injector()
 injector.useLogging(VerboseConsoleLogger)
 injector
-  .setupStores(stores =>
+  .setupStores((stores) =>
     stores
       .addStore(new InMemoryStore({ model: Session, primaryKey: 'sessionId' }))
       .addStore(
@@ -82,10 +82,10 @@ injector
   )
   .useLogging(FileStoreLogger)
   .useHttpAuthentication({
-    getUserStore: sm => sm.getStoreFor(User),
-    getSessionStore: sm => sm.getStoreFor(Session),
+    getUserStore: (sm) => sm.getStoreFor(User),
+    getSessionStore: (sm) => sm.getStoreFor(Session),
   })
-  .setupRepository(repo =>
+  .setupRepository((repo) =>
     repo
       .createDataSet(LogEntry, { ...authorizedDataSet, name: 'logEntries' })
       .createDataSet(User, {

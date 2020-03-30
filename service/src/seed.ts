@@ -87,7 +87,7 @@ seed(mainInjector)
     await mainInjector.dispose()
     process.exit(0)
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err)
     process.exit(1)
   })

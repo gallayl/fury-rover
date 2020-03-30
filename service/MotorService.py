@@ -15,6 +15,7 @@ def arduino_map(x, in_min, in_max, out_min, out_max):
 
 
 def turnOffMotors():
+    mh._pwm.setAllPWM(0, 0)
     mh.getMotor(1).run(Raspi_MotorHAT.RELEASE)
     mh.getMotor(2).run(Raspi_MotorHAT.RELEASE)
     mh.getMotor(3).run(Raspi_MotorHAT.RELEASE)

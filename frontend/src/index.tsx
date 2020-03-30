@@ -22,7 +22,7 @@ rest
     method: 'POST',
     action: '/motors/stopAll',
   })
-  .then(resp => console.log('Motors stopped', resp))
+  .then((resp) => console.log('Motors stopped', resp))
 
 rest.call({
   method: 'POST',

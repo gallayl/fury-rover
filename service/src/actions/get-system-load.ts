@@ -12,8 +12,8 @@ export const GetSystemLoadAction: RequestAction<{
   }
 }> = async () => {
   const [cpuTemperatureValue, currentLoadValue] = await Promise.all([
-    new Promise<Systeminformation.CpuTemperatureData>(resolve => cpuTemperature(resolve)),
-    new Promise<Systeminformation.CurrentLoadData>(resolve => currentLoad(resolve)),
+    new Promise<Systeminformation.CpuTemperatureData>((resolve) => cpuTemperature(resolve)),
+    new Promise<Systeminformation.CurrentLoadData>((resolve) => currentLoad(resolve)),
   ])
 
   const responseBody = {

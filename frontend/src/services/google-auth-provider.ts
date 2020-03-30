@@ -131,7 +131,7 @@ export class GoogleOauthProvider {
       this.iframe.style.display = 'none'
       this.iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts')
 
-      this.iframe.onload = async ev => {
+      this.iframe.onload = async (ev) => {
         let location: Location | null = null
         await Retrier.create(async () => {
           try {
@@ -195,7 +195,7 @@ export class GoogleOauthProvider {
    */
   public getGoogleTokenFromUri(uri: Location): string | null {
     const tokenSegmentPrefix = '#id_token='
-    const tokenSegment = uri.hash.split('&').find(segment => segment.indexOf(tokenSegmentPrefix) === 0)
+    const tokenSegment = uri.hash.split('&').find((segment) => segment.indexOf(tokenSegmentPrefix) === 0)
     if (tokenSegment) {
       return tokenSegment.replace(tokenSegmentPrefix, '')
     }
@@ -220,7 +220,7 @@ declare module '@furystack/inject/dist/injector' {
   }
 }
 
-Injector.prototype.useGoogleAuth = function(options: GoogleAuthenticationOptions) {
+Injector.prototype.useGoogleAuth = function (options: GoogleAuthenticationOptions) {
   const newOptions = new GoogleAuthenticationOptions()
 
   if (!options.redirectUri) {

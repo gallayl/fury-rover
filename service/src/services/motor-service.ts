@@ -18,17 +18,17 @@ export class MotorService {
 
   private listenStdOut() {
     let data = ''
-    this.pyService.stdout.on('data', d => {
+    this.pyService.stdout.on('data', (d) => {
       this.logger.debug({ message: `Data: ${d}` })
       data += d
     })
 
-    this.pyService.stderr.on('data', d => {
+    this.pyService.stderr.on('data', (d) => {
       this.logger.warning({ message: `Data: ${d}` })
       data += d
     })
 
-    this.pyService.stdout.on('error', d => {
+    this.pyService.stdout.on('error', (d) => {
       this.logger.warning({ message: `Error: ${d}` })
       data += d
     })
@@ -38,7 +38,7 @@ export class MotorService {
       data = ''
     })
 
-    this.pyService.on('exit', code => {
+    this.pyService.on('exit', (code) => {
       this.logger.warning({
         message: `PythonMotorService exited with code ${code}`,
       })
@@ -76,7 +76,7 @@ export class MotorService {
   }
 
   public setServos(servoValues: Array<{ id: number; value: number }>) {
-    this.writeToPy(`servo ${servoValues.map(v => `${v.id}=${v.value}`).join(';')}`)
+    this.writeToPy(`servo ${servoValues.map((v) => `${v.id}=${v.value}`).join(';')}`)
   }
 
   private readonly logger: ScopedLogger
@@ -92,6 +92,6 @@ export class MotorService {
       env: process.env,
     })
     this.listenStdOut()
-    this.msgFromPy.subscribe(value => this.logger.debug({ message: `@Py: ${value}` }))
+    this.msgFromPy.subscribe((value) => this.logger.debug({ message: `@Py: ${value}` }))
   }
 }

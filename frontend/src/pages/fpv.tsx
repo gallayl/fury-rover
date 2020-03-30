@@ -17,9 +17,9 @@ const updateLock = new Semaphore(1)
 
 export const FirstPersonView = Shade<any, FirstPersonViewState>({
   shadowDomName: 'shade-first-person-view',
-  initialState: {
+  getInitialState: () => ({
     sensitivity: VECTOR_MULTIPLIER,
-  },
+  }),
   constructed: ({ getState, updateState, injector }) => {
     const isUpdateNeeded = () => {
       const currentState = getState()
@@ -87,7 +87,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                 width: '100%',
                 height: '100%',
               }}
-              onchange={ev => {
+              onchange={(ev) => {
                 const { value } = ev.currentTarget as HTMLInputElement
                 if (value && !isNaN(value as any))
                   injector.getInstance(RestClient).call({
@@ -132,11 +132,11 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
               />
             </NippleComponent>
             <div
-              onclick={ev => {
+              onclick={(ev) => {
                 ev.preventDefault()
                 ev.stopPropagation()
               }}
-              onmousemove={ev => {
+              onmousemove={(ev) => {
                 ev.preventDefault()
                 ev.stopPropagation()
               }}
@@ -157,7 +157,7 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                     height: '100%',
                   } as any
                 }
-                onchange={ev => {
+                onchange={(ev) => {
                   const { value } = ev.currentTarget as HTMLInputElement
                   if (value && !isNaN(value as any))
                     injector.getInstance(RestClient).call({

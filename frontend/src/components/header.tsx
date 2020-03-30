@@ -21,7 +21,7 @@ export const Header = Shade<HeaderProps>({
             {props.title}
           </RouteLink>
         </h3>
-        {props.links.map(link => (
+        {props.links.map((link) => (
           <RouteLink title={link.name} href={link.url} style={{ ...urlStyle, padding: '0 8px', cursor: 'pointer' }}>
             {link.name || ''}
           </RouteLink>
