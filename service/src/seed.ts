@@ -1,5 +1,5 @@
 import { User, Servo, Motor } from 'common'
-import { PhysicalStore, StoreManager, SearchOptions } from '@furystack/core'
+import { PhysicalStore, StoreManager, FindOptions } from '@furystack/core'
 import '@furystack/repository'
 import { HttpAuthenticationSettings } from '@furystack/rest-service'
 import { Injector } from '@furystack/inject'
@@ -13,12 +13,12 @@ import { existsSync, writeFileSync } from 'fs'
  * @param store The physical store to use
  */
 export const getOrCreate = async <T>(
-  filter: SearchOptions<T, Array<keyof T>>,
+  filter: FindOptions<T, Array<keyof T>>,
   instance: T,
   store: PhysicalStore<T>,
   injector: Injector,
 ) => {
-  const result = await store.search(filter)
+  const result = await store.find(filter)
   const logger = injector.logger.withScope('Seeder')
   if (result.length === 1) {
     return result[0]

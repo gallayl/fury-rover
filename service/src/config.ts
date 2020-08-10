@@ -1,12 +1,12 @@
 import { Injector } from '@furystack/inject'
-import { HttpUserContext } from '@furystack/rest-service'
 import { DataSetSettings } from '@furystack/repository'
 import { VerboseConsoleLogger } from '@furystack/logging'
-import { FileStore, InMemoryStore } from '@furystack/core'
+import { InMemoryStore } from '@furystack/core'
 import { LogEntry, User, Session, Motor, Servo } from 'common'
 import { join } from 'path'
 import { MotorService } from './services'
 import { FileStoreLogger } from './services/file-store-logger'
+import { FileSystemStore } from '@furystack/filesystem-store'
 
 export const storeFiles = {
   users: join(__filename, '..', '..', 'stores', 'users.json'),
@@ -16,14 +16,14 @@ export const storeFiles = {
 }
 
 export const authorizedOnly = async (options: { injector: Injector }) => {
-  const authorized = await options.injector.getInstance(HttpUserContext).isAuthenticated()
+  const authorized = await options.injector.isAuthenticated()
   return {
     isAllowed: authorized,
     message: 'You are not authorized :(',
   }
 }
 
-export const authorizedDataSet: Partial<DataSetSettings<any>> = {
+export const authorizedDataSet: Partial<DataSetSettings<any, any>> = {
   authorizeAdd: authorizedOnly,
   authorizeGet: authorizedOnly,
   authorizeRemove: authorizedOnly,
@@ -44,7 +44,7 @@ injector
         }),
       )
       .addStore(
-        new FileStore({
+        new FileSystemStore({
           model: User,
           primaryKey: 'username',
           logger: injector.logger,
@@ -53,7 +53,7 @@ injector
         }),
       )
       .addStore(
-        new FileStore({
+        new FileSystemStore({
           model: Motor,
           primaryKey: 'id',
           fileName: storeFiles.motors,
@@ -62,7 +62,7 @@ injector
         }),
       )
       .addStore(
-        new FileStore({
+        new FileSystemStore({
           model: Servo,
           primaryKey: 'channel',
           fileName: storeFiles.servos,
@@ -71,7 +71,7 @@ injector
         }),
       )
       .addStore(
-        new FileStore({
+        new FileSystemStore({
           model: Session,
           primaryKey: 'sessionId',
           fileName: storeFiles.sessions,
@@ -87,13 +87,11 @@ injector
   })
   .setupRepository((repo) =>
     repo
-      .createDataSet(LogEntry, { ...authorizedDataSet, name: 'logEntries' })
+      .createDataSet(LogEntry, { ...authorizedDataSet })
       .createDataSet(User, {
         ...authorizedDataSet,
-        name: 'users',
       })
       .createDataSet(Servo, {
-        name: 'servos',
         authorizeAdd: async () => ({
           isAllowed: false,
           message: 'Cannot add an entity into a prepopulated hardware collection',
@@ -103,7 +101,6 @@ injector
         },
       })
       .createDataSet(Motor, {
-        name: 'motors',
         authorizeAdd: async () => ({
           isAllowed: false,
           message: 'Cannot add an entity into a prepopulated hardware collection',

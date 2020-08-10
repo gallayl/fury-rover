@@ -11,19 +11,20 @@
     "build": "tsc -b"
   },
   "devDependencies": {
-    "@types/node": "^13.7.4",
-    "@types/wake_on_lan": "^0.0.27"
+    "@types/node": "^14.0.27",
+    "@types/wake_on_lan": "^0.0.28"
   },
   "dependencies": {
-    "@furystack/auth-google": "^4.0.8",
-    "@furystack/core": "^8.0.2",
-    "@furystack/inject": "^4.0.2",
-    "@furystack/logging": "^2.0.3",
-    "@furystack/repository": "^2.0.3",
-    "@furystack/rest-service": "^1.1.2",
+    "@furystack/auth-google": "^4.0.44",
+    "@furystack/core": "^9.1.7",
+    "@furystack/filesystem-store": "^1.1.7",
+    "@furystack/inject": "^4.0.36",
+    "@furystack/logging": "^2.0.43",
+    "@furystack/repository": "^3.0.10",
+    "@furystack/rest-service": "^2.1.14",
     "common": "1.0.0",
-    "systeminformation": "^4.14.8",
-    "tslib": "^1.10.0",
+    "systeminformation": "^4.26.10",
+    "tslib": "^2.0.1",
     "wake_on_lan": "^1.0.0",
     "websocket-stream": "^5.5.0"
   }

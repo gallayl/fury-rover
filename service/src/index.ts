@@ -18,12 +18,12 @@ injector.useRestService<FuryRoverApi>({
       '/systemLoad': Authenticate()(GetSystemLoadAction),
       '/systemDetails': Authenticate()(GetSystemDetailsAction),
       '/motors': Authenticate()(async ({ injector: i }) => {
-        const motors: Motor[] = await i.getDataSetFor(Motor).filter(i, { top: 100 })
+        const motors: Motor[] = await i.getDataSetFor(Motor).find(i, { top: 100 })
         return JsonResult(motors)
       }),
       '/systemLog': Authenticate()(async ({ injector: i, getBody }) => {
         const filter = await getBody()
-        const result = await i.getDataSetFor<LogEntry>('logEntries').filter(i, filter)
+        const result = await i.getDataSetFor(LogEntry).find(i, filter)
         return JsonResult(result as LogEntry[])
       }),
     },

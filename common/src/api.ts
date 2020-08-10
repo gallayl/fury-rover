@@ -1,7 +1,7 @@
 import { RestApi, RequestAction } from '@furystack/rest'
 import { Systeminformation } from 'systeminformation'
 import { Motor, LogEntry } from './models'
-import { User as FUser, SearchOptions } from '@furystack/core'
+import { User as FUser, FindOptions } from '@furystack/core'
 
 export interface FuryRoverApi extends RestApi {
   GET: {
@@ -28,7 +28,7 @@ export interface FuryRoverApi extends RestApi {
         fsSize: Systeminformation.FsSizeData[]
       }
     }>
-    '/systemLog': RequestAction<{ result: LogEntry[]; body: SearchOptions<LogEntry, any> }>
+    '/systemLog': RequestAction<{ result: LogEntry[]; body: FindOptions<LogEntry, any> }>
     '/motors': RequestAction<{ result: Motor[] }>
   }
   POST: {

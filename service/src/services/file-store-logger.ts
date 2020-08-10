@@ -1,7 +1,8 @@
 import { AbstractLogger, LeveledLogEntry, LogLevel } from '@furystack/logging'
 import { Injectable } from '@furystack/inject'
 import { LogEntry } from 'common'
-import { FileStore, StoreManager } from '@furystack/core'
+import { StoreManager } from '@furystack/core'
+import { FileSystemStore } from '@furystack/filesystem-store'
 
 @Injectable()
 export class FileStoreLogger extends AbstractLogger {
@@ -10,7 +11,7 @@ export class FileStoreLogger extends AbstractLogger {
     this.logLevels = []
   }
 
-  private readonly logStore: FileStore<LogEntry>
+  private readonly logStore: FileSystemStore<LogEntry>
 
   public async addEntry<T>(entry: LeveledLogEntry<T>) {
     if (this.logLevels.includes(entry.level) && this.logStore.tick) {
@@ -21,6 +22,6 @@ export class FileStoreLogger extends AbstractLogger {
 
   constructor(storeManager: StoreManager) {
     super()
-    this.logStore = storeManager.getStoreFor<LogEntry, FileStore<LogEntry>>(LogEntry)
+    this.logStore = storeManager.getStoreFor<LogEntry, FileSystemStore<LogEntry>>(LogEntry)
   }
 }
