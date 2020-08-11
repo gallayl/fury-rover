@@ -1,7 +1,6 @@
 /** ToDo: Main entry point */
 import { Layout } from './components/layout'
 import { Injector } from '@furystack/inject'
-import { PathHelper } from '@furystack/utils'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { VerboseConsoleLogger } from '@furystack/logging'
 import './services/google-auth-provider'
