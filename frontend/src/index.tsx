@@ -1,6 +1,7 @@
 /** ToDo: Main entry point */
 import { Layout } from './components/layout'
 import { Injector } from '@furystack/inject'
+import { PathHelper } from '@furystack/utils'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { VerboseConsoleLogger } from '@furystack/logging'
 import './services/google-auth-provider'
@@ -13,7 +14,7 @@ export const environmentOptions = {
   debug: Boolean(process.env.DEBUG),
   appVersion: process.env.APP_VERSION as string,
   buildDate: new Date(process.env.BUILD_DATE as string),
-  serviceUrl: (process.env.SERVICE_URL as string) || `${window.location.protocol}//${window.location.hostname}:9090`,
+  serviceUrl: location.origin,
 }
 
 const rest = shadeInjector.getInstance(RestClient)

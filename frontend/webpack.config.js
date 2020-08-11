@@ -15,6 +15,9 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     host: '0.0.0.0',
+    proxy: {
+      '/api': 'http://localhost:9090',
+    },
   },
   optimization: {
     splitChunks: {
@@ -50,7 +53,6 @@ module.exports = {
       DEBUG: true,
       APP_VERSION: require('./package.json').version,
       BUILD_DATE: new Date().toISOString(),
-      SERVICE_URL: process.env.FURY_ROVER_SERVICE || 'http://localhost:9090',
     }),
     new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
   ],
