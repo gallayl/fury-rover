@@ -1,4 +1,4 @@
-import { User, Servo, Motor } from 'common'
+import { User } from 'common'
 import { PhysicalStore, StoreManager, FindOptions } from '@furystack/core'
 import '@furystack/repository'
 import { HttpAuthenticationSettings } from '@furystack/rest-service'
@@ -61,23 +61,6 @@ export const seed = async (injector: Injector) => {
     userStore as PhysicalStore<User>,
     injector,
   )
-
-  const servoStore = sm.getStoreFor(Servo)
-  const defaultServoValue = 90
-
-  for (let i = 0; i < 4; i++) {
-    await getOrCreate(
-      { filter: { channel: { $eq: i } } },
-      { channel: i, currentValue: defaultServoValue },
-      servoStore,
-      injector,
-    )
-  }
-
-  const motorStore = sm.getStoreFor(Motor)
-  for (let i = 1; i <= 4; i++) {
-    await getOrCreate({ filter: { id: { $eq: i } } }, { id: i, value: 0 }, motorStore, injector)
-  }
 
   logger.verbose({ message: 'Seeding data completed.' })
 }

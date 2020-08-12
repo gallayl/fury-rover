@@ -1,46 +1,32 @@
 import { RestApi, RequestAction } from '@furystack/rest'
-import { Systeminformation } from 'systeminformation'
-import { Motor, LogEntry } from './models'
-import { User as FUser, FindOptions } from '@furystack/core'
+import { User as FUser } from '@furystack/core'
+import { Direction } from 'motor-hat'
+import { SERVOS } from './constants'
 
 export interface FuryRoverApi extends RestApi {
   GET: {
     '/isAuthenticated': RequestAction<{ result: { isAuthenticated: boolean } }>
     '/currentUser': RequestAction<{ result: FUser }>
-    '/systemLoad': RequestAction<{
-      result: {
-        freemem: number
-        totalmem: number
-        uptime: number
-        currentLoad: Systeminformation.CurrentLoadData
-        cpuTemperature: Systeminformation.CpuTemperatureData
-      }
-    }>
-    '/systemDetails': RequestAction<{
-      result: {
-        platform: NodeJS.Platform
-        osType: string
-        osRelease: string
-        cpu: Systeminformation.CpuData
-        hostname: string
-        mem: Systeminformation.MemData
-        diskLayout: Systeminformation.DiskLayoutData[]
-        fsSize: Systeminformation.FsSizeData[]
-      }
-    }>
-    '/systemLog': RequestAction<{ result: LogEntry[]; body: FindOptions<LogEntry, any> }>
-    '/motors': RequestAction<{ result: Motor[] }>
   }
   POST: {
-    '/wakeOnLan': RequestAction<{ result: { success: boolean }; body: { mac: string } }>
     '/login': RequestAction<{ body: { username: string; password: string }; result: FUser }>
     '/logout': RequestAction<{}>
-    '/googleLogin': RequestAction<{ body: { token: string }; result: FUser }>
     '/motors/stopAll': RequestAction<{}>
     '/move': RequestAction<{
-      body: { steer: number; frontLeft: number; backLeft: number; frontRight: number; backRight: number }
+      body: {
+        direction: Direction
+        steerPercent: number
+        frontPercent: number
+        rearLeftPercent: number
+        rearRightPercent: number
+      }
     }>
     '/release': RequestAction<{}>
-    '/servos/setValues': RequestAction<{ body: Array<{ id: number; value: number }> }>
+    '/servos/setValues': RequestAction<{
+      body: Array<{ servo: keyof typeof SERVOS; percent: number }>
+    }>
+    '/servos/calibrate': RequestAction<{
+      body: Array<{ servo: keyof typeof SERVOS; freq: number; min: number; max: number; percent: number }>
+    }>
   }
 }

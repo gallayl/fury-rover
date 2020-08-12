@@ -1,7 +1,6 @@
 import { Button, Input } from '../components/common'
 import { SessionService } from '../services/session'
 import { Loader } from '../components/loader'
-import { GoogleOauthProvider } from '../services/google-auth-provider'
 import { Shade, createComponent, RouteLink } from '@furystack/shades'
 
 export const Login = Shade({
@@ -116,23 +115,6 @@ export const Login = Shade({
               </Button>
             </div>
             <p style={{ fontSize: '10px', textAlign: 'center' }}>You can also log in with</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Button
-                type="button"
-                onclick={async () => {
-                  try {
-                    await injector.getInstance(GoogleOauthProvider).login()
-                  } catch (e) {
-                    updateState({ error: e.body.error })
-                  }
-                }}>
-                Google
-              </Button>
-              <Button disabled style={{ margin: '0 .3em' }}>
-                Facebook
-              </Button>{' '}
-              <Button disabled>GitHub</Button>
-            </div>
             <div
               style={{
                 display: 'flex',

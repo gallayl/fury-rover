@@ -1,9 +1,10 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { join } from 'path'
 import { Injectable, Injector } from '@furystack/inject'
 import { ScopedLogger } from '@furystack/logging'
-import { ObservableValue, Retrier } from '@furystack/utils'
 import Semaphore from 'semaphore-async-await'
+
+import { Direction, Motor, MotorHat, Servo } from 'motor-hat'
+import { Constants } from 'common'
 
 /**
  * Service class for Adafruit Motor HAT
@@ -12,74 +13,113 @@ import Semaphore from 'semaphore-async-await'
 export class MotorService {
   writeLock = new Semaphore(1)
 
-  private readonly pyService: ChildProcessWithoutNullStreams
-
-  public readonly msgFromPy: ObservableValue<string> = new ObservableValue('')
-
-  private listenStdOut() {
-    let data = ''
-    this.pyService.stdout.on('data', (d) => {
-      this.logger.debug({ message: `Data: ${d}` })
-      data += d
-    })
-
-    this.pyService.stderr.on('data', (d) => {
-      this.logger.warning({ message: `Data: ${d}` })
-      data += d
-    })
-
-    this.pyService.stdout.on('error', (d) => {
-      this.logger.warning({ message: `Error: ${d}` })
-      data += d
-    })
-
-    this.pyService.stdout.on('end', () => {
-      this.msgFromPy.setValue(data)
-      data = ''
-    })
-
-    this.pyService.on('exit', (code) => {
-      this.logger.warning({
-        message: `PythonMotorService exited with code ${code}`,
-      })
-    })
-  }
-
-  private async writeToPy(value: string) {
+  public async setMotorValue(motor: keyof typeof Constants.MOTORS, direction: Direction, speedPercent: number) {
     try {
       await this.writeLock.acquire()
-      await Retrier.create(async () => this.pyService.stdin.writable).setup({
-        RetryIntervalMs: 1,
-        Retries: 5,
-        onFail: () => this.logger.warning({ message: 'Failed to write to stdin.' }),
+      const motorIndex = Object.keys(Constants.MOTORS).indexOf(motor as any)
+      await new Promise((resolve, reject) => {
+        this.hat.dcs[motorIndex].setSpeed(speedPercent, (err) => {
+          err
+            ? reject(err)
+            : this.hat.dcs[motorIndex].run(direction, (err2) => {
+                err2 ? reject(err2) : resolve()
+              })
+        })
       })
-      this.pyService.stdin.write(`${value}\n`)
+    } finally {
+      this.writeLock.release()
+    }
+  }
+  public async stopAll() {
+    try {
+      await this.writeLock.acquire()
+      await Promise.all(
+        this.hat.dcs.map(
+          async (m) =>
+            await new Promise((resolve, reject) =>
+              m.stop((err) => {
+                err ? reject(err) : resolve()
+              }),
+            ),
+        ),
+      )
     } finally {
       this.writeLock.release()
     }
   }
 
-  public setMotorValue(motorId: number, motorValue: number) {
-    this.writeToPy(`set ${motorId} ${motorValue}`)
+  public async setServos(servoValues: Array<{ servo: keyof typeof Constants.SERVOS; percent: number }>) {
+    try {
+      await this.writeLock.acquire()
+      servoValues.forEach(({ servo, percent }) => {
+        const servoIndex = Object.keys(Constants.SERVOS).indexOf(servo)
+        this.hat.servos[servoIndex].moveTo(percent)
+      })
+    } finally {
+      this.writeLock.release()
+    }
   }
 
-  public setAll(motorValue: number) {
-    this.writeToPy(`setAll ${motorValue}`)
-  }
-
-  public stopAll() {
-    this.writeToPy(`stopAll`)
-  }
-
-  public set4(values: [number, number, number, number]) {
-    this.writeToPy(`set4 ${values.join(' ')}`)
-  }
-
-  public setServos(servoValues: Array<{ id: number; value: number }>) {
-    this.writeToPy(`servo ${servoValues.map((v) => `${v.id}=${v.value}`).join(';')}`)
+  public async calibrateServo(
+    servo: keyof typeof Constants.SERVOS,
+    freq: number,
+    min: number,
+    max: number,
+    percent: number,
+  ) {
+    try {
+      await this.writeLock.acquire()
+      const servoIndex = Object.keys(Constants.SERVOS).indexOf(servo)
+      this.hat.servos[servoIndex].calibrate(freq, min, max)
+      this.hat.servos[servoIndex].moveTo(percent)
+    } finally {
+      this.writeLock.release()
+    }
   }
 
   private readonly logger: ScopedLogger
+
+  private hat!: MotorHat
+
+  private async initHat() {
+    try {
+      await this.writeLock.acquire()
+      this.hat = (await import('motor-hat'))
+        .default({
+          address: 0x6f,
+          dcs: Object.values(Constants.MOTORS) as Motor[],
+          servos: Object.values(Constants.SERVOS),
+        })
+        .init()
+
+      Object.entries(Constants.SERVOS).map(([key, value]) => {
+        const calibration = Constants.SERVO_CALIBRATION[key as keyof typeof Constants.SERVO_CALIBRATION]
+        this.hat.servos[value].calibrate(60, calibration.minPulse, calibration.maxPulse)
+      })
+    } catch (error) {
+      this.logger.warning({ message: 'Failed to init Motor HAT, using a mocked one', data: { error } })
+      const syncMock = () => ({})
+      this.hat = ({
+        dcs: Object.entries(Constants.MOTORS).map(() => ({
+          init: () => ({} as any),
+          runSync: syncMock,
+          setSpeedSync: syncMock,
+          setFrequencySync: syncMock,
+          setFrequency: (_freq: number, cb: () => void) => cb(),
+          stopSync: syncMock,
+          stop: (cb: () => void) => cb(),
+          setSpeed: (_speed: number, cb: () => void) => cb(),
+          run: (_dir: number, cb: () => void) => cb(),
+        })),
+        servos: Object.entries(Constants.SERVOS).map<Servo>(() => ({
+          calibrate: () => ({}),
+          moveTo: () => ({}),
+        })),
+      } as any) as MotorHat
+    } finally {
+      this.writeLock.release()
+    }
+  }
 
   constructor(injector: Injector) {
     this.logger = injector.logger.withScope('@furystack-quad/PythonMotorService')
@@ -87,11 +127,7 @@ export class MotorService {
     this.logger.verbose({
       message: `Spawning Python process with file ${path}`,
     })
-    this.pyService = spawn('python3', [path], {
-      cwd: process.cwd(),
-      env: process.env,
-    })
-    this.listenStdOut()
-    this.msgFromPy.subscribe((value) => this.logger.debug({ message: `@Py: ${value}` }))
+
+    this.initHat()
   }
 }
