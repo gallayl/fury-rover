@@ -1,7 +1,7 @@
 import { Injectable } from '@furystack/inject'
 import Semaphore from 'semaphore-async-await'
-import { Direction } from 'motor-hat'
 import { RestClient } from './rest-client'
+import { Constants } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class MovementService {
@@ -40,17 +40,17 @@ export class MovementService {
 
   public async move(options: { throttle: number; steerPercent: number }) {
     this.nextTick = async () => {
-      const direction: Direction = options.throttle >= 0 ? 'fwd' : 'back'
+      const direction: Constants.Direction = options.throttle >= 0 ? 'forward' : 'back'
       const throttle = Math.min(100, Math.abs(Math.round(options.throttle * 10))) // ToDo: 10?
       await this.api.call({
         method: 'POST',
         action: '/move',
         body: {
           direction,
-          steerPercent: options.steerPercent,
-          frontPercent: throttle,
-          rearLeftPercent: throttle,
-          rearRightPercent: throttle,
+          steer: options.steerPercent,
+          frontThrottle: throttle,
+          rearLeftThrottle: throttle,
+          rearRightThrottle: throttle,
         },
       })
     }

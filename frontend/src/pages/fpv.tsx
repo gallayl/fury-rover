@@ -35,8 +35,8 @@ export const FirstPersonView = Shade<any>({
                 if (value && !isNaN(value as any))
                   injector.getInstance(RestClient).call({
                     method: 'POST',
-                    action: '/servos/setValues',
-                    body: [{ servo: 'yaw', percent: parseInt(value, 10) }],
+                    action: '/servos/set',
+                    body: { servo: 'yaw', on: 0, off: parseInt(value, 10) },
                   })
               }}
             />
@@ -104,8 +104,8 @@ export const FirstPersonView = Shade<any>({
                   if (value && !isNaN(value as any))
                     injector.getInstance(RestClient).call({
                       method: 'POST',
-                      action: '/servos/setValues',
-                      body: [{ servo: 'pitch', percent: parseInt(value, 10) }],
+                      action: '/servos/set',
+                      body: { servo: 'pitch', on: 0, off: parseInt(value, 10) },
                     })
                 }}
               />

@@ -48,7 +48,6 @@ injector
           primaryKey: 'username',
           logger: injector.logger,
           fileName: storeFiles.users,
-          tickMs: 60 * 1000,
         }),
       )
 
@@ -58,7 +57,6 @@ injector
           primaryKey: 'sessionId',
           fileName: storeFiles.sessions,
           logger: injector.logger,
-          tickMs: Number.MAX_SAFE_INTEGER,
         }),
       ),
   )

@@ -1,7 +1,6 @@
 import { RestApi, RequestAction } from '@furystack/rest'
 import { User as FUser } from '@furystack/core'
-import { Direction } from 'motor-hat'
-import { SERVOS } from './constants'
+import { SERVOS, Direction, MOTORS } from './constants'
 
 export interface FuryRoverApi extends RestApi {
   GET: {
@@ -15,18 +14,18 @@ export interface FuryRoverApi extends RestApi {
     '/move': RequestAction<{
       body: {
         direction: Direction
-        steerPercent: number
-        frontPercent: number
-        rearLeftPercent: number
-        rearRightPercent: number
+        steer: number
+        frontThrottle: number
+        rearLeftThrottle: number
+        rearRightThrottle: number
       }
     }>
     '/release': RequestAction<{}>
-    '/servos/setValues': RequestAction<{
-      body: Array<{ servo: keyof typeof SERVOS; percent: number }>
+    '/motors/set': RequestAction<{
+      body: { motor: keyof typeof MOTORS; direction: Direction; speed: number }
     }>
-    '/servos/calibrate': RequestAction<{
-      body: Array<{ servo: keyof typeof SERVOS; freq: number; min: number; max: number; percent: number }>
+    '/servos/set': RequestAction<{
+      body: { servo: keyof typeof SERVOS; on: number; off: number }
     }>
   }
 }
