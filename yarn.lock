@@ -127,6 +127,22 @@
     "@furystack/inject" "^4.0.39"
     tslib "^2.0.0"
 
+"@furystack/shades-common-components@1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@furystack/shades-common-components/-/shades-common-components-1.2.8.tgz#85d629cce48a60c035bbf3a91f96c4f6b06387ce"
+  integrity sha512-VUtHdYamsyu29HDrMOU7ZKaeMTtmuEgwIMFB17b1qWc2UbrB0A79RZXpZQnh0FWQVn68VEOXbgKh2RdYN6wIJQ==
+  dependencies:
+    "@furystack/shades" "^3.2.25"
+    uuid "^8.3.0"
+
+"@furystack/shades-nipple@1.0.15":
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/@furystack/shades-nipple/-/shades-nipple-1.0.15.tgz#f6df322cb8926c451d5cfbddab90f929e0f75ecc"
+  integrity sha512-zepm+puxTwiUXFSa2x4DwQSRdqqDo9llNxH8FO9Lx1N/vwATQZIip5Q1C7Yjle58BzYH3UxWanbwhoj2AiF3Qg==
+  dependencies:
+    "@furystack/shades" "^3.2.25"
+    nipplejs "^0.8.7"
+
 "@furystack/shades@^3.2.25":
   version "3.2.25"
   resolved "https://registry.yarnpkg.com/@furystack/shades/-/shades-3.2.25.tgz#3cfcb5933d66d5c05b23b29848d09827d60a1fd2"

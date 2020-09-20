@@ -1,4 +1,4 @@
-import { Button, Input } from '../components/common'
+import { Button, Input } from '@furystack/shades-common-components'
 import { SessionService } from '../services/session'
 import { Loader } from '../components/loader'
 import { Shade, createComponent, RouteLink } from '@furystack/shades'

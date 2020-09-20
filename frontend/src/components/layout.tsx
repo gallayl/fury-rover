@@ -1,7 +1,7 @@
 import { SessionService } from '../services/session'
 import { Body } from './body'
 import { Header } from './header'
-import { Button } from './common'
+import { Button } from '@furystack/shades-common-components'
 import { createComponent, Shade } from '@furystack/shades'
 
 export const Layout = Shade({

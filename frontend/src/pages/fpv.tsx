@@ -1,4 +1,4 @@
-import { NippleComponent } from '../components/nipple'
+import { NippleComponent } from '@furystack/shades-nipple'
 import { RestClient } from '../services/rest-client'
 import { Shade, createComponent } from '@furystack/shades'
 import { MovementService } from '../services/movement-service'
