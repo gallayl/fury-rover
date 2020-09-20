@@ -2,7 +2,7 @@ import { Injectable, Injector } from '@furystack/inject'
 import { ScopedLogger } from '@furystack/logging'
 import Semaphore from 'semaphore-async-await'
 import { Constants } from 'common'
-import { open, pwmSetData, write, PWM, OUTPUT, LOW, HIGH } from 'rpio'
+import { open, pwmSetData, write, PWM, OUTPUT, LOW, HIGH, init } from 'rpio'
 
 /**
  * Service class for Adafruit Motor HAT
@@ -16,7 +16,8 @@ export class MotorService {
   private async initPins() {
     try {
       await this.writeLock.acquire()
-
+      // init({mapping: 'gpio'});
+      init({ gpiomem: false })
       // PWMs
       open(8, PWM)
       open(13, PWM)
