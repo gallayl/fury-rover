@@ -6,12 +6,12 @@
   "private": true,
   "scripts": {},
   "devDependencies": {
-    "@types/node": "^14.0.27",
+    "@types/node": "^14.11.1",
     "@types/wake_on_lan": "^0.0.28",
-    "systeminformation": "^4.26.10"
+    "systeminformation": "^4.27.5"
   },
   "dependencies": {
-    "@furystack/rest": "^1.1.20",
+    "@furystack/rest": "^1.2.3",
     "tslib": "^2.0.1"
   }
 }
