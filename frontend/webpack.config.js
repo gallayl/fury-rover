@@ -1,4 +1,5 @@
-var path = require('path')
+/* eslint-disable @typescript-eslint/no-var-requires */
+const path = require('path')
 const webpack = require('webpack')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -10,7 +11,7 @@ module.exports = {
     filename: '[name].bundle.js',
     chunkFilename: '[name].bundle.js',
     publicPath: '/',
-    path: path.resolve(__dirname + '/bundle'),
+    path: path.resolve(`${__dirname}/bundle`),
   },
   devServer: {
     historyApiFallback: true,
