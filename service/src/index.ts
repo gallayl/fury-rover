@@ -27,6 +27,12 @@ injector.useRestService<FuryRoverApi>({
           return JsonResult({}, 200)
         }
 
+        await motorService.setServos([
+          {
+            id: Constants.SERVOS.steer,
+            value: steer,
+          },
+        ])
         await motorService.setMotorValue(Constants.MOTORS.front, (direction === 'back' ? -1 : 1) * frontThrottle)
         await motorService.setMotorValue(Constants.MOTORS.rearLeft, (direction === 'back' ? -1 : 1) * rearLeftThrottle)
         await motorService.setMotorValue(
