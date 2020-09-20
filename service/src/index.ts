@@ -19,17 +19,20 @@ injector.useRestService<FuryRoverApi>({
       '/login': LoginAction,
       '/logout': LogoutAction,
       '/move': Authenticate()(async ({ getBody, injector: i }) => {
-        // ToDo: All
         const { direction, frontThrottle, rearLeftThrottle, rearRightThrottle, steer } = await getBody()
         const motorService = i.getInstance(MotorService)
-        // service.setServos([{ servo: 'steer', percent: steerPercent }])
-        await motorService.setDirection(Constants.MOTORS.front as Constants.MotorChannel, direction)
-        await motorService.setDirection(Constants.MOTORS.rearLeft as Constants.MotorChannel, direction)
-        await motorService.setDirection(Constants.MOTORS.rearRight as Constants.MotorChannel, direction)
 
-        await motorService.setSpeed(Constants.MOTORS.front as Constants.MotorChannel, frontThrottle)
-        await motorService.setSpeed(Constants.MOTORS.rearLeft as Constants.MotorChannel, rearLeftThrottle)
-        await motorService.setSpeed(Constants.MOTORS.rearRight as Constants.MotorChannel, rearRightThrottle)
+        if (direction === 'release') {
+          await motorService.stopAll()
+          return JsonResult({}, 200)
+        }
+
+        await motorService.setMotorValue(Constants.MOTORS.front, (direction === 'back' ? -1 : 1) * frontThrottle)
+        await motorService.setMotorValue(Constants.MOTORS.rearLeft, (direction === 'back' ? -1 : 1) * rearLeftThrottle)
+        await motorService.setMotorValue(
+          Constants.MOTORS.rearRight,
+          (direction === 'back' ? -1 : 1) * rearRightThrottle,
+        )
 
         await i
           .getInstance(ServoService)
@@ -57,8 +60,9 @@ injector.useRestService<FuryRoverApi>({
       }),
       '/motors/set': Authenticate()(async ({ getBody, injector: i }) => {
         const { motor, direction, speed } = await getBody()
-        i.getInstance(MotorService).setDirection(Constants.MOTORS[motor] as Constants.MotorChannel, direction)
-        i.getInstance(MotorService).setSpeed(Constants.MOTORS[motor] as Constants.MotorChannel, speed)
+        await i
+          .getInstance(MotorService)
+          .setMotorValue(Constants.MOTORS[motor], (direction === 'back' ? -1 : 1) * speed)
         return JsonResult({}, 200)
       }),
     },
