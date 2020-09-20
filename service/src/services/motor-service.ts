@@ -55,6 +55,11 @@ export class MotorService {
       })
       this.logger.debug({ message: `Send to PythonService: ${value}` })
       this.pyService.stdin.write(`${value}\n`)
+    } catch (error) {
+      this.logger.warning({
+        message: 'Error from PythonMotorService',
+        data: { message: error.message, stack: error.stack },
+      })
     } finally {
       this.writeLock.release()
     }
