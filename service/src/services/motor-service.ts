@@ -53,6 +53,7 @@ export class MotorService {
         Retries: 5,
         onFail: () => this.logger.warning({ message: 'Failed to write to stdin.' }),
       })
+      this.logger.debug({ message: `Send to PythonService: ${value}` })
       this.pyService.stdin.write(`${value}\n`)
     } finally {
       this.writeLock.release()
