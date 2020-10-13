@@ -55,7 +55,6 @@ module.exports = {
       APP_VERSION: require('./package.json').version,
       BUILD_DATE: new Date().toISOString(),
     }),
-    new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
   ],
   module: {
     rules: [
