@@ -22,7 +22,6 @@
     "@furystack/repository": "^4.0.1",
     "@furystack/rest-service": "^2.2.4",
     "common": "1.0.0",
-    "rpio": "^2.2.0",
     "tslib": "^2.0.3",
     "websocket-stream": "^5.5.0"
   }

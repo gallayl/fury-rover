@@ -6,7 +6,6 @@ import { MotorService } from './services'
 import { LoginAction, LogoutAction, GetCurrentUser, IsAuthenticated, Authenticate } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest'
 import { injector } from './config'
-import { ServoService } from './services/servo-service'
 
 injector.useRestService<FuryRoverApi>({
   root: 'api',
@@ -41,8 +40,8 @@ injector.useRestService<FuryRoverApi>({
         )
 
         await i
-          .getInstance(ServoService)
-          .setPwm({ channel: Constants.SERVOS.steer as Constants.ServoChannel, on: 0, off: steer })
+          .getInstance(MotorService)
+          .setServos([{ id: Constants.SERVOS.steer as Constants.ServoChannel, value: steer }])
 
         return JsonResult({}, 200)
       }),
@@ -57,11 +56,12 @@ injector.useRestService<FuryRoverApi>({
       }),
       '/servos/set': Authenticate()(async ({ getBody, injector: i }) => {
         const body = await getBody()
-        i.getInstance(ServoService).setPwm({
-          channel: Constants.SERVOS[body.servo] as Constants.ServoChannel,
-          on: body.on,
-          off: body.off,
-        })
+        i.getInstance(MotorService).setServos([
+          {
+            id: Constants.SERVOS[body.servo] as Constants.ServoChannel,
+            value: body.off,
+          },
+        ])
         return JsonResult({}, 200)
       }),
       '/motors/set': Authenticate()(async ({ getBody, injector: i }) => {
