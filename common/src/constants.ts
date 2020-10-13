@@ -10,12 +10,6 @@ export const SERVOS = {
   steer: 15,
 }
 
-export const SERVO_CALIBRATION: { [key in keyof typeof SERVOS]: { minPulse: number; maxPulse: number } } = {
-  pitch: { minPulse: 1, maxPulse: 2 },
-  yaw: { minPulse: 1, maxPulse: 2 },
-  steer: { minPulse: 1.1, maxPulse: 2.6 },
-}
-
 export const MOTORS = {
   front: 3,
   rearLeft: 1,
