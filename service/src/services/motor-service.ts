@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { join } from 'path'
 import { Injectable, Injector } from '@furystack/inject'
 import { ScopedLogger } from '@furystack/logging'
-import { ObservableValue, Retrier } from '@furystack/utils'
+import { ObservableValue, Retrier, sleepAsync } from '@furystack/utils'
 import Semaphore from 'semaphore-async-await'
 
 /**
@@ -18,9 +18,11 @@ export class MotorService {
 
   private listenStdOut() {
     let data = ''
-    this.pyService.stdout.on('data', (d) => {
+    this.pyService.stdout.on('data', async (d) => {
       this.logger.debug({ message: `Data: ${d}` })
       data += d
+      await sleepAsync(10)
+      this.writeLock.release()
     })
 
     this.pyService.stderr.on('data', (d) => {
@@ -61,7 +63,7 @@ export class MotorService {
         data: { message: error.message, stack: error.stack },
       })
     } finally {
-      this.writeLock.release()
+      // this.writeLock.release()
     }
   }
 
