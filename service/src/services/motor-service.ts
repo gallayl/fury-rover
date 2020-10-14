@@ -66,11 +66,11 @@ export class MotorService {
   }
 
   public setMotorValue(motorId: number, motorValue: number) {
-    return this.writeToPy(`set ${motorId} ${motorValue}`)
+    return this.writeToPy(`set ${motorId} ${Math.round(motorValue)}`)
   }
 
   public setAll(motorValue: number) {
-    return this.writeToPy(`setAll ${motorValue}`)
+    return this.writeToPy(`setAll ${Math.round(motorValue)}`)
   }
 
   public stopAll() {
@@ -78,11 +78,11 @@ export class MotorService {
   }
 
   public set4(values: [number, number, number, number]) {
-    return this.writeToPy(`set4 ${values.join(' ')}`)
+    return this.writeToPy(`set4 ${values.map((v) => Math.round(v)).join(' ')}`)
   }
 
   public setServos(servoValues: Array<{ id: number; value: number }>) {
-    return this.writeToPy(`servo ${servoValues.map((v) => `${v.id}=${v.value}`).join(';')}`)
+    return this.writeToPy(`servo ${servoValues.map((v) => `${v.id}=${Math.round(v.value)}`).join(';')}`)
   }
 
   private readonly logger: ScopedLogger
