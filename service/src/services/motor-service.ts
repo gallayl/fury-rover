@@ -21,7 +21,7 @@ export class MotorService {
     this.pyService.stdout.on('data', async (d) => {
       this.logger.debug({ message: `Data: ${d}` })
       data += d
-      await sleepAsync(10)
+      await sleepAsync(25)
       this.writeLock.release()
     })
 
