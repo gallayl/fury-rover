@@ -22,6 +22,7 @@
     "@furystack/repository": "^4.0.1",
     "@furystack/rest-service": "^2.2.4",
     "common": "1.0.0",
+    "pigpio": "^3.2.4",
     "tslib": "^2.0.3",
     "websocket-stream": "^5.5.0"
   }

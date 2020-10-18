@@ -4,6 +4,7 @@ import { Injectable, Injector } from '@furystack/inject'
 import { ScopedLogger } from '@furystack/logging'
 import { ObservableValue, Retrier } from '@furystack/utils'
 import Semaphore from 'semaphore-async-await'
+import { Gpio } from 'pigpio'
 
 /**
  * Service class for Adafruit Motor HAT
@@ -15,6 +16,18 @@ export class MotorService {
   private readonly pyService: ChildProcessWithoutNullStreams
 
   public readonly msgFromPy: ObservableValue<string> = new ObservableValue('')
+
+  private readonly leftMotorListener = new Gpio(27, {
+    mode: Gpio.INPUT,
+    pullUpDown: Gpio.PUD_DOWN,
+    edge: Gpio.EITHER_EDGE,
+  })
+
+  private readonly rightMotorListener = new Gpio(27, {
+    mode: Gpio.INPUT,
+    pullUpDown: Gpio.PUD_DOWN,
+    edge: Gpio.EITHER_EDGE,
+  })
 
   private listenStdOut() {
     let data = ''
@@ -100,5 +113,8 @@ export class MotorService {
     })
     this.listenStdOut()
     this.msgFromPy.subscribe((value) => this.logger.debug({ message: `@Py: ${value}` }))
+
+    this.leftMotorListener.on('interrupt', () => console.log('leftMotorTick'))
+    this.rightMotorListener.on('interrupt', () => console.log('rightMotorTick'))
   }
 }
