@@ -18,7 +18,7 @@ injector.useRestService<FuryRoverApi>({
       '/login': LoginAction,
       '/logout': LogoutAction,
       '/move': Authenticate()(async ({ getBody, injector: i }) => {
-        const { direction, frontThrottle, rearLeftThrottle, rearRightThrottle, steer } = await getBody()
+        const { direction, throttle, steer } = await getBody()
         const motorService = i.getInstance(MotorService)
 
         if (direction === 'release') {
@@ -26,23 +26,8 @@ injector.useRestService<FuryRoverApi>({
           return JsonResult({}, 200)
         }
 
-        await motorService.setServos([
-          {
-            id: Constants.SERVOS.steer,
-            value: steer,
-          },
-        ])
-        await motorService.setMotorValue(Constants.MOTORS.front, (direction === 'back' ? -1 : 1) * frontThrottle)
-        await motorService.setMotorValue(Constants.MOTORS.rearLeft, (direction === 'back' ? -1 : 1) * rearLeftThrottle)
-        await motorService.setMotorValue(
-          Constants.MOTORS.rearRight,
-          (direction === 'back' ? -1 : 1) * rearRightThrottle,
-        )
-
-        await i
-          .getInstance(MotorService)
-          .setServos([{ id: Constants.SERVOS.steer as Constants.ServoChannel, value: steer }])
-
+        await motorService.setMotorValue(Constants.MOTORS.left, (direction === 'back' ? -1 : 1) * throttle * steer)
+        await motorService.setMotorValue(Constants.MOTORS.right, (direction === 'back' ? -1 : 1) * throttle * -steer)
         return JsonResult({}, 200)
       }),
       '/motors/stopAll': Authenticate()(async ({ injector: i }) => {

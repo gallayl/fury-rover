@@ -40,20 +40,16 @@ export class MovementService {
 
   public async move(options: { throttle: number; steerPercent: number }) {
     this.nextTick = async () => {
-      const direction: Constants.Direction = options.throttle >= 0 ? 'forward' : 'back'
       const throttle = Math.min(512, Math.abs(Math.round(options.throttle * 30))) // ToDo: 10?
-
-      const steer = 90 + (options.steerPercent - 50) * 0.6
+      const direction: Constants.Direction = throttle < 1 ? 'release' : options.throttle >= 0 ? 'forward' : 'back'
 
       await this.api.call({
         method: 'POST',
         action: '/move',
         body: {
           direction,
-          steer,
-          frontThrottle: throttle,
-          rearLeftThrottle: throttle,
-          rearRightThrottle: throttle,
+          steer: options.steerPercent,
+          throttle,
         },
       })
     }

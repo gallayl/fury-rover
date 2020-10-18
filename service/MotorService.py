@@ -33,19 +33,22 @@ def setMotor(channel, value):
             motor.run(mh.RELEASE)
     value = max(min(abs(value), 255), 0)
     motor.setSpeed(value)
-    sys.stdout.write("Motor " + str(channel) + " has been set to " + str(value) + "\r\n")
+    sys.stdout.write("Motor " + str(channel) +
+                     " has been set to " + str(value) + "\r\n")
     sys.stdout.flush()
     time.sleep(0.005)
 
 
 def setServo(channel, value):
     if (channel not in [0, 1, 14, 15]):
-        sys.stdout.write(str(channel) + " is invalid. Has to be 0, 1 ,14 or 15\r\n")
+        sys.stdout.write(
+            str(channel) + " is invalid. Has to be 0, 1 ,14 or 15\r\n")
         sys.stdout.flush()
         return
     value = arduino_map(value, 0, 180, servoMin, servoMax)
     mh.setPwm(channel, 0, value)
-    sys.stdout.write("Servo " + str(channel) + " has been set to " + str(value) + "\r\n")
+    sys.stdout.write("Servo " + str(channel) +
+                     " has been set to " + str(value) + "\r\n")
     sys.stdout.flush()
     time.sleep(0.005)
 

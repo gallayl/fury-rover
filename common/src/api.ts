@@ -15,9 +15,7 @@ export interface FuryRoverApi extends RestApi {
       body: {
         direction: Direction
         steer: number
-        frontThrottle: number
-        rearLeftThrottle: number
-        rearRightThrottle: number
+        throttle: number
       }
     }>
     '/release': RequestAction<{}>

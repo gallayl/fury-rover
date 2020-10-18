@@ -11,7 +11,6 @@ export const SERVOS = {
 }
 
 export const MOTORS = {
-  front: 3,
-  rearLeft: 1,
-  rearRight: 2,
+  left: 3,
+  right: 2,
 }
