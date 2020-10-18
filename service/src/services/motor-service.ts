@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { join } from 'path'
 import { Injectable, Injector } from '@furystack/inject'
 import { ScopedLogger } from '@furystack/logging'
-import { ObservableValue, Retrier, sleepAsync } from '@furystack/utils'
+import { ObservableValue, Retrier } from '@furystack/utils'
 import Semaphore from 'semaphore-async-await'
 
 /**
