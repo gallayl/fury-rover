@@ -21,13 +21,18 @@ injector.useRestService<FuryRoverApi>({
         const { direction, throttle, steer } = await getBody()
         const motorService = i.getInstance(MotorService)
 
+        const steerValue = steer - 50
+
         if (direction === 'release') {
           await motorService.stopAll()
           return JsonResult({}, 200)
         }
 
-        await motorService.setMotorValue(Constants.MOTORS.left, (direction === 'back' ? -1 : 1) * throttle * steer)
-        await motorService.setMotorValue(Constants.MOTORS.right, (direction === 'back' ? -1 : 1) * throttle * -steer)
+        await motorService.setMotorValue(Constants.MOTORS.left, (direction === 'back' ? -1 : 1) * throttle * steerValue)
+        await motorService.setMotorValue(
+          Constants.MOTORS.right,
+          (direction === 'back' ? -1 : 1) * throttle * -steerValue,
+        )
         return JsonResult({}, 200)
       }),
       '/motors/stopAll': Authenticate()(async ({ injector: i }) => {
