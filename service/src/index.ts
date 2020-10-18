@@ -21,7 +21,7 @@ injector.useRestService<FuryRoverApi>({
         const { direction, throttle, steer } = await getBody()
         const motorService = i.getInstance(MotorService)
 
-        const steerValue = steer - 50
+        const steerValue = (steer - 50) * 0.02 // from -1 to 1
 
         if (direction === 'release') {
           await motorService.stopAll()
@@ -30,11 +30,11 @@ injector.useRestService<FuryRoverApi>({
 
         await motorService.setMotorValue(
           Constants.MOTORS.left,
-          (direction === 'back' ? -1 : 1) * throttle * (steerValue * 0.01),
+          (direction === 'back' ? -1 : 1) * throttle + throttle * steerValue,
         )
         await motorService.setMotorValue(
           Constants.MOTORS.right,
-          (direction === 'back' ? -1 : 1) * throttle * (-steerValue * 0.01),
+          (direction === 'back' ? -1 : 1) * throttle - throttle * steerValue,
         )
         return JsonResult({}, 200)
       }),
