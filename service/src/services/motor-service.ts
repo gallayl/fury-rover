@@ -4,6 +4,7 @@ import { Injectable, Injector } from '@furystack/inject'
 import { ScopedLogger } from '@furystack/logging'
 import { ObservableValue, Retrier } from '@furystack/utils'
 import Semaphore from 'semaphore-async-await'
+import { Gpio } from 'pigpio'
 
 /**
  * Service class for Adafruit Motor HAT
@@ -16,11 +17,24 @@ export class MotorService {
 
   public readonly msgFromPy: ObservableValue<string> = new ObservableValue('')
 
+  private readonly leftMotorListener = new Gpio(27, {
+    mode: Gpio.INPUT,
+    pullUpDown: Gpio.PUD_DOWN,
+    edge: Gpio.EITHER_EDGE,
+  })
+
+  private readonly rightMotorListener = new Gpio(27, {
+    mode: Gpio.INPUT,
+    pullUpDown: Gpio.PUD_DOWN,
+    edge: Gpio.EITHER_EDGE,
+  })
+
   private listenStdOut() {
     let data = ''
-    this.pyService.stdout.on('data', (d) => {
+    this.pyService.stdout.on('data', async (d) => {
       this.logger.debug({ message: `Data: ${d}` })
       data += d
+      this.writeLock.release()
     })
 
     this.pyService.stderr.on('data', (d) => {
@@ -53,30 +67,36 @@ export class MotorService {
         Retries: 5,
         onFail: () => this.logger.warning({ message: 'Failed to write to stdin.' }),
       })
+      this.logger.debug({ message: `Send to PythonService: ${value}` })
       this.pyService.stdin.write(`${value}\n`)
+    } catch (error) {
+      this.logger.warning({
+        message: 'Error from PythonMotorService',
+        data: { message: error.message, stack: error.stack },
+      })
     } finally {
-      this.writeLock.release()
+      // this.writeLock.release()
     }
   }
 
   public setMotorValue(motorId: number, motorValue: number) {
-    this.writeToPy(`set ${motorId} ${motorValue}`)
+    return this.writeToPy(`set ${motorId} ${Math.round(motorValue)}`)
   }
 
   public setAll(motorValue: number) {
-    this.writeToPy(`setAll ${motorValue}`)
+    return this.writeToPy(`setAll ${Math.round(motorValue)}`)
   }
 
   public stopAll() {
-    this.writeToPy(`stopAll`)
+    return this.writeToPy(`stopAll`)
   }
 
   public set4(values: [number, number, number, number]) {
-    this.writeToPy(`set4 ${values.join(' ')}`)
+    return this.writeToPy(`set4 ${values.map((v) => Math.round(v)).join(' ')}`)
   }
 
   public setServos(servoValues: Array<{ id: number; value: number }>) {
-    this.writeToPy(`servo ${servoValues.map((v) => `${v.id}=${v.value}`).join(';')}`)
+    return this.writeToPy(`servo ${servoValues.map((v) => `${v.id}=${Math.round(v.value)}`).join(';')}`)
   }
 
   private readonly logger: ScopedLogger
@@ -93,5 +113,8 @@ export class MotorService {
     })
     this.listenStdOut()
     this.msgFromPy.subscribe((value) => this.logger.debug({ message: `@Py: ${value}` }))
+
+    this.leftMotorListener.on('interrupt', () => console.log('leftMotorTick'))
+    this.rightMotorListener.on('interrupt', () => console.log('rightMotorTick'))
   }
 }

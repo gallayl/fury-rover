@@ -1,68 +1,11 @@
-import { NippleComponent } from '../components/nipple'
+import { NippleComponent } from '@furystack/shades-nipple'
 import { RestClient } from '../services/rest-client'
 import { Shade, createComponent } from '@furystack/shades'
-import { JoystickOutputData } from 'nipplejs'
-import Semaphore from 'semaphore-async-await'
+import { MovementService } from '../services/movement-service'
 
-export interface FirstPersonViewState {
-  data?: JoystickOutputData
-  lastSentData?: JoystickOutputData
-  sensitivity: number
-}
-
-const VECTOR_MULTIPLIER = 30
-const UPDATE_TIMEOUT = 150
-
-const updateLock = new Semaphore(1)
-
-export const FirstPersonView = Shade<any, FirstPersonViewState>({
+export const FirstPersonView = Shade<any>({
   shadowDomName: 'shade-first-person-view',
-  getInitialState: () => ({
-    sensitivity: VECTOR_MULTIPLIER,
-  }),
-  constructed: ({ getState, updateState, injector }) => {
-    const isUpdateNeeded = () => {
-      const currentState = getState()
-      return !currentState.lastSentData ||
-        (currentState.data &&
-          JSON.stringify(currentState.lastSentData.vector) !== JSON.stringify(currentState.data.vector))
-        ? true
-        : false
-    }
-
-    const interval = setInterval(async () => {
-      const currentState = getState()
-      if (isUpdateNeeded()) {
-        if (currentState.data && updateLock.getPermits()) {
-          try {
-            await updateLock.acquire()
-            if (isUpdateNeeded()) {
-              const throttle = Math.round(currentState.data.vector.y * VECTOR_MULTIPLIER * currentState.data.force)
-              const steer = Math.max(0, Math.min(180, Math.round(90 + 60 * Math.cos(currentState.data.angle.radian))))
-              updateState({ lastSentData: currentState.data }, true)
-              await injector.getInstance(RestClient).call({
-                method: 'POST',
-                action: '/move',
-                body: {
-                  frontLeft: throttle,
-                  backLeft: throttle,
-                  frontRight: throttle,
-                  backRight: throttle,
-                  steer,
-                },
-              })
-            }
-          } finally {
-            updateLock.release()
-          }
-        }
-      }
-    }, UPDATE_TIMEOUT)
-    return () => {
-      clearInterval(interval)
-    }
-  },
-  render: ({ getState, updateState, injector }) => {
+  render: ({ injector }) => {
     return (
       <div
         style={{
@@ -81,8 +24,8 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
             <input
               type="range"
               min="0"
-              max="90"
-              value="45"
+              max="100"
+              value="50"
               style={{
                 width: '100%',
                 height: '100%',
@@ -92,8 +35,8 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                 if (value && !isNaN(value as any))
                   injector.getInstance(RestClient).call({
                     method: 'POST',
-                    action: '/servos/setValues',
-                    body: [{ id: 0, value: parseInt(value, 10) }],
+                    action: '/servos/set',
+                    body: { servo: 'yaw', on: 0, off: parseInt(value, 10) },
                   })
               }}
             />
@@ -111,13 +54,12 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                 size: 500,
               }}
               onMove={(_e, data) => {
-                updateState({ data }, true)
+                const throttle = data.vector.y * data.force
+                const steer = Math.max(0, Math.min(100, Math.round(50 + 50 * Math.cos(data.angle.radian))))
+                injector.getInstance(MovementService).move({ throttle, steerPercent: steer })
               }}
               onEnd={() => {
-                injector.getInstance(RestClient).call({ method: 'POST', action: '/release' })
-                const newData = { ...getState().data, vector: { x: 0, y: 0 } }
-                updateState({ lastSentData: newData }, true)
-                updateState({ data: newData }, true)
+                injector.getInstance(MovementService).release()
               }}>
               <img
                 src="/"
@@ -148,8 +90,8 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
               <input
                 type="range"
                 min="0"
-                max="160"
-                value="0"
+                max="100"
+                value="50"
                 style={
                   {
                     '-webkit-appearance': 'slider-vertical',
@@ -162,8 +104,8 @@ export const FirstPersonView = Shade<any, FirstPersonViewState>({
                   if (value && !isNaN(value as any))
                     injector.getInstance(RestClient).call({
                       method: 'POST',
-                      action: '/servos/setValues',
-                      body: [{ id: 1, value: parseInt(value, 10) }],
+                      action: '/servos/set',
+                      body: { servo: 'pitch', on: 0, off: parseInt(value, 10) },
                     })
                 }}
               />

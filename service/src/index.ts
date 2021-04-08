@@ -1,13 +1,11 @@
 import '@furystack/core'
 import '@furystack/repository'
 import '@furystack/rest-service'
-import { Motor, FuryRoverApi, LogEntry } from 'common'
+import { FuryRoverApi, Constants } from 'common'
 import { MotorService } from './services'
 import { LoginAction, LogoutAction, GetCurrentUser, IsAuthenticated, Authenticate } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest'
 import { injector } from './config'
-import { GoogleLoginAction } from '@furystack/auth-google'
-import { GetSystemLoadAction, GetSystemDetailsAction, WakeOnLanAction } from './actions'
 
 injector.useRestService<FuryRoverApi>({
   root: 'api',
@@ -15,49 +13,55 @@ injector.useRestService<FuryRoverApi>({
     GET: {
       '/currentUser': GetCurrentUser,
       '/isAuthenticated': IsAuthenticated,
-      '/systemLoad': Authenticate()(GetSystemLoadAction),
-      '/systemDetails': Authenticate()(GetSystemDetailsAction),
-      '/motors': Authenticate()(async ({ injector: i }) => {
-        const motors: Motor[] = await i.getDataSetFor(Motor).find(i, { top: 100 })
-        return JsonResult(motors)
-      }),
-      '/systemLog': Authenticate()(async ({ injector: i, getBody }) => {
-        const filter = await getBody()
-        const result = await i.getDataSetFor(LogEntry).find(i, filter)
-        return JsonResult(result as LogEntry[])
-      }),
     },
     POST: {
-      '/googleLogin': GoogleLoginAction,
       '/login': LoginAction,
       '/logout': LogoutAction,
-      '/wakeOnLan': Authenticate()(WakeOnLanAction),
       '/move': Authenticate()(async ({ getBody, injector: i }) => {
-        const { frontLeft, backLeft, frontRight, backRight, steer } = await getBody()
-        const service = i.getInstance(MotorService)
-        service.set4([frontLeft, backLeft, frontRight, backRight])
-        service.setServos([
-          { id: 14, value: steer },
-          { id: 15, value: steer },
-        ])
+        const { direction, throttle, steer } = await getBody()
+        const motorService = i.getInstance(MotorService)
+
+        const steerValue = (steer - 50) * 0.02 // from -1 to 1
+
+        if (direction === 'release') {
+          await motorService.stopAll()
+          return JsonResult({}, 200)
+        }
+
+        await motorService.setMotorValue(
+          Constants.MOTORS.left,
+          (direction === 'back' ? -1 : 1) * throttle + throttle * steerValue,
+        )
+        await motorService.setMotorValue(
+          Constants.MOTORS.right,
+          (direction === 'back' ? -1 : 1) * throttle - throttle * steerValue,
+        )
         return JsonResult({}, 200)
       }),
       '/motors/stopAll': Authenticate()(async ({ injector: i }) => {
         i.getInstance(MotorService).stopAll()
         return JsonResult({}, 200)
       }),
-      '/servos/setValues': Authenticate()(async ({ injector: i, getBody }) => {
-        const values = await getBody()
-        i.getInstance(MotorService).setServos(values)
-        return JsonResult({}, 200)
-      }),
       '/release': Authenticate()(async ({ injector: i }) => {
         const motorService = i.getInstance(MotorService)
-        motorService.setServos([
-          { id: 14, value: 90 },
-          { id: 15, value: 90 },
-        ])
         motorService.stopAll()
+        return JsonResult({}, 200)
+      }),
+      '/servos/set': Authenticate()(async ({ getBody, injector: i }) => {
+        const body = await getBody()
+        i.getInstance(MotorService).setServos([
+          {
+            id: Constants.SERVOS[body.servo] as Constants.ServoChannel,
+            value: body.off,
+          },
+        ])
+        return JsonResult({}, 200)
+      }),
+      '/motors/set': Authenticate()(async ({ getBody, injector: i }) => {
+        const { motor, direction, speed } = await getBody()
+        await i
+          .getInstance(MotorService)
+          .setMotorValue(Constants.MOTORS[motor], (direction === 'back' ? -1 : 1) * speed)
         return JsonResult({}, 200)
       }),
     },
